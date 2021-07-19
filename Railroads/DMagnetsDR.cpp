@@ -45,6 +45,66 @@ if ( (NNode->dr==nullptr)&&(NNode->ur==nullptr)&&(NNode->dl==nullptr) )
                     }
                 while (flag);
 
+
+                //===== check for connection with junctions ===========
+
+
+                //junction UL_L
+
+
+
+                if ( CornerLimits(i0,j0) && (CornerNodes[i0][j0].ul!=nullptr)&&(CornerNodes[i0][j0].ul->type==tight_UL_L))
+                    {
+
+                        DMagnet * newmagnet = new DMagnet();
+                        newmagnet->address.i=i0;
+                        newmagnet->address.j=j0;
+                        newmagnet->address.type=NetworkNodeTypes::corner;
+                        newmagnet->newelement = new class junctionUL_L();
+
+                        static_cast<class junctionUL_L*>(newmagnet->newelement)->dr=&(CornerNodes[i0][j0]);
+                        static_cast<class junctionUL_L*>(newmagnet->newelement)->ul=&(CornerNodes[i0-2][j0-2]);
+                        static_cast<class junctionUL_L*>(newmagnet->newelement)->l=&(VerticalSideNodes[i0-3][j0-2]);
+                        static_cast<class junctionUL_L*>(newmagnet->newelement)->i = i0-3;
+                        static_cast<class junctionUL_L*>(newmagnet->newelement)->j = j0-2;
+
+                        QList<DNetworkListElement*> allowed;
+                        allowed.append(CornerNodes[i0][j0].ul);
+
+                        /*if ((CornerNodes[RailStart.i-2][RailStart.j-2].dr!=nullptr)&&(CornerNodes[RailStart.i-2][RailStart.j-2].dr->type=diagULDR))
+                            allowed.append(CornerNodes[RailStart.i-2][RailStart.j-2].dr);*/
+                        newmagnet->prev = prevptr;
+                        newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
+                        magnets.append(newmagnet);
+                    }
+
+                //junction UL_U
+
+                if ( CornerLimits(i0,j0) && (CornerNodes[i0][j0].ul!=nullptr)&&(CornerNodes[i0][j0].ul->type==tight_UL_U))
+                    {
+
+                        DMagnet * newmagnet = new DMagnet();
+                        newmagnet->address.i=i0;
+                        newmagnet->address.j=j0;
+                        newmagnet->address.type=NetworkNodeTypes::corner;
+                        newmagnet->newelement = new class junctionUL_U();
+
+                        static_cast<class junctionUL_U*>(newmagnet->newelement)->dr=&(CornerNodes[i0][j0]);
+                        static_cast<class junctionUL_U*>(newmagnet->newelement)->ul=&(CornerNodes[i0-2][j0-2]);
+                        static_cast<class junctionUL_U*>(newmagnet->newelement)->u=&(HorizontalSideNodes[i0-2][j0-3]);
+                        static_cast<class junctionUL_U*>(newmagnet->newelement)->i = i0-2;
+                        static_cast<class junctionUL_U*>(newmagnet->newelement)->j = j0-3;
+
+                        QList<DNetworkListElement*> allowed;
+                        allowed.append(CornerNodes[i0][j0].ul);
+
+                        /*if ((CornerNodes[RailStart.i-2][RailStart.j-2].dr!=nullptr)&&(CornerNodes[RailStart.i-2][RailStart.j-2].dr->type=diagULDR))
+                            allowed.append(CornerNodes[RailStart.i-2][RailStart.j-2].dr);*/
+                        newmagnet->prev = prevptr;
+                        newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
+                        magnets.append(newmagnet);
+                    }
+
     }
 
 

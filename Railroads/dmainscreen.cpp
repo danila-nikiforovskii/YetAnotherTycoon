@@ -270,7 +270,7 @@ void DMainScreen::timerEvent(QTimerEvent *event)
 
 }
 
-unsigned long DMainScreen::DRandom()
+unsigned long long DMainScreen::DRandom()
 {
     seed = (seed*25214903917 + 11)%281474976710656;
     return seed;
@@ -289,26 +289,26 @@ void DMainScreen::draw()
 
 void DMainScreen::initializeGL()
 {
-    textureID[0]=bindTexture(QPixmap(QString("C:/QtProject/RailAssets/atlas.bmp")), GL_TEXTURE_2D);
+    textureID[0]=bindTexture(QPixmap(QString(GAME_ROOT_DIR).append("atlas.bmp")), GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,  GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,  GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    textureID[1]=bindTexture(QPixmap(QString("C:/QtProject/RailAssets/trees.bmp")), GL_TEXTURE_2D);
+    textureID[1]=bindTexture(QPixmap(QString(GAME_ROOT_DIR).append("trees.bmp")), GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,  GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,  GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    textureID[2]=bindTexture(QPixmap(QString("C:/QtProject/RailAssets/rivers.bmp")), GL_TEXTURE_2D);
+    textureID[2]=bindTexture(QPixmap(QString(GAME_ROOT_DIR).append("rivers.bmp")), GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,  GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,  GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
-    textureID[7]=bindTexture(QPixmap(QString("C:/QtProject/RailAssets/blank.bmp")), GL_TEXTURE_2D);
+    textureID[7]=bindTexture(QPixmap(QString(GAME_ROOT_DIR).append("blank.bmp")), GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,  GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,  GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -317,8 +317,8 @@ void DMainScreen::initializeGL()
     glEnable(GL_TEXTURE_2D);
 
     shader = new QOpenGLShaderProgram();
-    shader->addShaderFromSourceFile(QOpenGLShader::Vertex,"C:/QtProject/RailAssets/vertex.txt");
-    shader->addShaderFromSourceFile(QOpenGLShader::Fragment,"C:/QtProject/RailAssets/frag.txt");
+    shader->addShaderFromSourceFile(QOpenGLShader::Vertex,QString(GAME_ROOT_DIR).append("vertex.txt"));
+    shader->addShaderFromSourceFile(QOpenGLShader::Fragment,QString(GAME_ROOT_DIR).append("frag.txt"));
     shader->link();
     /* shader->bind();
     VertexBuffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
@@ -360,23 +360,23 @@ void DMainScreen::initializeGL()
 
 
     treeshader = new QOpenGLShaderProgram();
-    treeshader->addShaderFromSourceFile(QOpenGLShader::Vertex,"C:/QtProject/RailAssets/vertex.txt");
-    treeshader->addShaderFromSourceFile(QOpenGLShader::Fragment,"C:/QtProject/RailAssets/frag_tree.txt");
+    treeshader->addShaderFromSourceFile(QOpenGLShader::Vertex,QString(GAME_ROOT_DIR).append("vertex.txt"));
+    treeshader->addShaderFromSourceFile(QOpenGLShader::Fragment,QString(GAME_ROOT_DIR).append("frag_tree.txt"));
     treeshader->link();
 
     flatshader = new QOpenGLShaderProgram();
-    flatshader->addShaderFromSourceFile(QOpenGLShader::Vertex,"C:/QtProject/RailAssets/vertex.txt");
-    flatshader->addShaderFromSourceFile(QOpenGLShader::Fragment,"C:/QtProject/RailAssets/frag_flat.txt");
+    flatshader->addShaderFromSourceFile(QOpenGLShader::Vertex,QString(GAME_ROOT_DIR).append("vertex.txt"));
+    flatshader->addShaderFromSourceFile(QOpenGLShader::Fragment,QString(GAME_ROOT_DIR).append("frag_flat.txt"));
     flatshader->link();
 
     rivershader = new QOpenGLShaderProgram();
-    rivershader->addShaderFromSourceFile(QOpenGLShader::Vertex,"C:/QtProject/RailAssets/vertex.txt");
-    rivershader->addShaderFromSourceFile(QOpenGLShader::Fragment,"C:/QtProject/RailAssets/frag_rivers.txt");
+    rivershader->addShaderFromSourceFile(QOpenGLShader::Vertex,QString(GAME_ROOT_DIR).append("vertex.txt"));
+    rivershader->addShaderFromSourceFile(QOpenGLShader::Fragment,QString(GAME_ROOT_DIR).append("frag_rivers.txt"));
     rivershader->link();
 
     cliffshader = new QOpenGLShaderProgram();
-    cliffshader->addShaderFromSourceFile(QOpenGLShader::Vertex,"C:/QtProject/RailAssets/vertex.txt");
-    cliffshader->addShaderFromSourceFile(QOpenGLShader::Fragment,"C:/QtProject/RailAssets/frag_cliff.txt");
+    cliffshader->addShaderFromSourceFile(QOpenGLShader::Vertex,QString(GAME_ROOT_DIR).append("vertex.txt"));
+    cliffshader->addShaderFromSourceFile(QOpenGLShader::Fragment,QString(GAME_ROOT_DIR).append("frag_cliff.txt"));
     cliffshader->link();
 
     simpleshader->bind();
@@ -467,6 +467,26 @@ void DMainScreen::initializeGL()
 
     OpenGL_INIT = true;
 }
+
+
+bool DMainScreen::CornerLimits(int i,int j)
+
+    {
+
+        return (i>=0)&&(i<=WIDTH)&&(j>0)&&(j<=HEIGHT);
+
+    }
+bool DMainScreen::HorLimits(int i,int j)
+    {
+        return (i>=0)&&(i<WIDTH)&&(j>0)&&(j<=HEIGHT);
+
+    }
+
+bool DMainScreen::VertLimits(int i,int j)
+    {
+        return (i>=0)&&(i<=WIDTH)&&(j>0)&&(j<HEIGHT);
+    }
+
 
 void DMainScreen::resizeGL(int width, int height)
 {
@@ -2797,9 +2817,9 @@ void DMainScreen::mousePressEvent(QMouseEvent *event)
 
                                             if (LastHoverGroup==HOVER_GROUP_CORNER)
                                                 {
-                                                    correct = ((CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].ul!=nullptr) && (CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].dr!=nullptr)) ||
-                                                            ((CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].ur!=nullptr) && (CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].dl!=nullptr));
-                                                    correct =!correct;
+                                                   // correct = ((CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].ul!=nullptr) && (CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].dr!=nullptr)) ||
+                                                    //        ((CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].ur!=nullptr) && (CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].dl!=nullptr));
+                                                    //correct =!correct;
                                                 }
                                         }
 

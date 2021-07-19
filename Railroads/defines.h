@@ -6,7 +6,7 @@
 #define WIDTH 100
 #define HEIGHT 100
 #define HEIGHT2 50
-#define GAME_ROOT_DIR "C:/QtProject/RailAssets/"
+#define GAME_ROOT_DIR "C:/YetAnotherTycoon/RailAssets/"
 
 // ======================= GAMEPLAY ==============================
 // TERRAIN TYPES

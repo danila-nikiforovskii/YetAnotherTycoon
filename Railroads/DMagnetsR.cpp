@@ -77,6 +77,40 @@ void DMainScreen::PREPARE_MAGNETS_R()
                    //magnets.append(newmagnet);
                }
 
+           //===========junction L_DL
+          if ( (VerticalSideNodes[i0][j0].l!=nullptr)&&(VerticalSideNodes[i0][j0].l->type==RailTypes::tight_UR_R))
+              {
+
+                  DMagnet * newmagnet = new DMagnet;
+                  newmagnet->address.i=i0;
+                  newmagnet->address.j=j0;
+                  newmagnet->address.type=NetworkNodeTypes::vert;
+                  newmagnet->newelement = new class junctionL_DL();
+
+                  static_cast<class junctionL_DL*>(newmagnet->newelement)->r=&(VerticalSideNodes[i0][j0]);;
+                  static_cast<class junctionL_DL*>(newmagnet->newelement)->l=&(VerticalSideNodes[i0-2][j0]);
+                  static_cast<class junctionL_DL*>(newmagnet->newelement)->dl=&(CornerNodes[i0-3][j0+2]);
+
+                  static_cast<class junctionL_DL*>(newmagnet->newelement)->i = i0-3;
+                  static_cast<class junctionL_DL*>(newmagnet->newelement)->j = j0;
+
+                  QList<DNetworkListElement*> allowed;
+                  allowed.append(VerticalSideNodes[i0][j0].l);
+
+                  newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
+                  newmagnet->prev = prevptr;
+
+                  flag = newmagnet->valid;
+                  if (flag)
+                      {
+                          magnets.append(newmagnet);
+                          prevptr = (magnets.last());
+                      }
+                  //if (newmagnet->valid)
+                  //magnets.append(newmagnet);
+              }
+
+
         }
 
 
@@ -176,9 +210,43 @@ void DMainScreen::PREPARE_MAGNETS_R()
         }
 
 
-    // ================= tight R_DR = tight UL_L
+    // ================= tight R_DR = tight UL_L + upgrade to junction UL L
     if (NNode->r==nullptr)
         {
+            if  ( (( CornerNodes[RailStart.i+3][RailStart.j+2].ul!=nullptr)&&(CornerNodes[RailStart.i+3][RailStart.j+2].ul->type==diagULDR))||
+                  (( CornerNodes[RailStart.i+2][RailStart.j+1].ul!=nullptr)&&(CornerNodes[RailStart.i+2][RailStart.j+1].ul->type==diagULDR)) )
+                {
+
+                    DMagnet * newmagnet = new DMagnet;
+                    newmagnet->address.i=RailStart.i+3;
+                    newmagnet->address.j=RailStart.j+2;
+                    newmagnet->address.type=NetworkNodeTypes::corner;
+                    newmagnet->newelement = new class junctionUL_L();
+
+                    static_cast<class junctionUL_L*>(newmagnet->newelement)->l=NNode;
+                    static_cast<class junctionUL_L*>(newmagnet->newelement)->ul=&(CornerNodes[RailStart.i+1][RailStart.j]);
+                    static_cast<class junctionUL_L*>(newmagnet->newelement)->dr=&(CornerNodes[RailStart.i+3][RailStart.j+2]);
+                    static_cast<class junctionUL_L*>(newmagnet->newelement)->i = RailStart.i;
+                    static_cast<class junctionUL_L*>(newmagnet->newelement)->j = RailStart.j;
+
+                    QList<DNetworkListElement*> allowed;
+
+                    if ((CornerNodes[RailStart.i+3][RailStart.j+2].ul!=nullptr)&&(CornerNodes[RailStart.i+3][RailStart.j+2].ul->type==diagULDR))
+                        allowed.append(CornerNodes[RailStart.i+3][RailStart.j+2].ul);
+
+                    if ((CornerNodes[RailStart.i+2][RailStart.j+1].ul!=nullptr)&&(CornerNodes[RailStart.i+2][RailStart.j+1].ul->type==diagULDR))
+                        allowed.append(CornerNodes[RailStart.i+2][RailStart.j+1].ul);
+
+                    newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
+                    magnets.append(newmagnet);
+
+                }
+                        else {
+
+
+
+
+
             DMagnet * newmagnet = new DMagnet;
             newmagnet->address.i=RailStart.i+3;
             newmagnet->address.j=RailStart.j+2;
@@ -190,6 +258,7 @@ void DMainScreen::PREPARE_MAGNETS_R()
             static_cast<class tight_UL_L*>(newmagnet->newelement)->j = RailStart.j;
             newmagnet->valid = check_obstruction(newmagnet->newelement);
             magnets.append(newmagnet);
+            }
         }
 
     // ================ upgrade tight R_DR to junction R_DR

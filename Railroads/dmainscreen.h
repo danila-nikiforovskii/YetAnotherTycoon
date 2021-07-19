@@ -76,6 +76,9 @@ public:
     QOpenGLShaderProgram *shader, *treeshader, *flatshader, *rivershader, *cliffshader, *simpleshader ;
     QOpenGLShaderProgram *uishader, *uimousemapshader;
 
+    bool CornerLimits(int i,int j);
+    bool HorLimits(int i,int j);
+    bool VertLimits(int i,int j);
 
     GLuint textureID[8];
 
@@ -96,8 +99,8 @@ public:
     DNetworkList * NetworkList;
 
     vec3 normals[WIDTH+1][HEIGHT+1];
-    unsigned long int seed;
-    unsigned long DRandom();
+    unsigned long long int seed;
+    unsigned long long DRandom();
     float DFloatRandom();
     int maintimer;
     int waterframe;
