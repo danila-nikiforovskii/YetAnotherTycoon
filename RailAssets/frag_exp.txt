@@ -1,0 +1,42 @@
+#version 130
+uniform sampler2D texture;
+uniform int frame;
+uniform int isback;
+void main()
+{
+
+
+
+const float rowcount = 15.0;
+const float colcount = 10.0;
+const float total = rowcount*colcount;
+
+if (frame >= int(total))
+	discard;
+else
+{
+
+int atlasx1 = (frame % int(floor(colcount)) );
+int atlasy1 = frame / int(floor(colcount));
+
+//int atlasy1 = 0;
+
+
+
+
+
+
+
+
+//vec4 col1 = texture2D(texture, vec2 (( atlasx1+gl_TexCoord[0].x)/colcount, ((rowcount-1-atlasy1)+gl_TexCoord[0].y)/rowcount  ));
+vec4 col1 = texture2D(texture, vec2 (( atlasx1+gl_TexCoord[0].x)/colcount, ((rowcount-1-atlasy1)+gl_TexCoord[0].y)/rowcount  ));
+
+
+
+if ((col1.r>0.99) && (col1.g<0.01) && (col1.b>0.99))
+	discard;
+else
+	gl_FragColor = col1;
+
+}
+}

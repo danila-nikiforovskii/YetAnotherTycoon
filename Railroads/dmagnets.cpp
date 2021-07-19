@@ -1,0 +1,21 @@
+#include <dmainscreen.h>
+
+void DMainScreen::PREPARE_MAGNETS_CORNERS()
+{
+    PREPARE_MAGNETS_UL();
+    PREPARE_MAGNETS_UR();
+    PREPARE_MAGNETS_DR();
+    PREPARE_MAGNETS_DL();
+}
+
+void DMainScreen::PREPARE_MAGNETS_HORIZONTAL_SIDES()
+{
+    PREPARE_MAGNETS_D();
+    PREPARE_MAGNETS_U();
+ }
+
+void DMainScreen::PREPARE_MAGNETS_VERTICAL_SIDES()
+{
+    PREPARE_MAGNETS_L();
+    PREPARE_MAGNETS_R();
+}

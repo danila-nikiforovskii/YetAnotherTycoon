@@ -1,0 +1,33 @@
+#version 130
+uniform sampler2D uitexture;
+
+uniform float width;
+uniform float height;
+
+uniform float id_r;
+uniform float id_g;
+uniform float id_b;
+in vec2 uv;
+void main()
+{
+//r 153
+//g 217
+//b 234
+
+//26
+//112
+//135
+
+
+vec4 mixcolor = vec4 (0.6,0.851,0.91764,1.0);
+vec4 uicol = texture2D(uitexture, vec2 (gl_TexCoord[0].x, gl_TexCoord[0].y ));
+
+
+	if ((uicol.r==1.0)&&(uicol.g==0.0)&&(uicol.b==1.0)) 
+		discard;
+	else {
+		
+		gl_FragColor = vec4(id_r,id_g,id_b,1.0);
+	}
+	
+}

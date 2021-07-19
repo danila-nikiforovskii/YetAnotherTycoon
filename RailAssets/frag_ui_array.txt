@@ -1,0 +1,25 @@
+#version 130
+uniform sampler2D texture;
+uniform sampler2D uitexture;
+
+in vec2 tx1;
+in vec2 tx2;
+
+uniform mat4 orthomat;
+
+void main()
+{
+
+
+	vec4 uicol = texture2D(uitexture, vec2 (tx1.x, tx1.y ));
+	vec4 basecol = texture2D(texture, vec2 (tx2.x, tx2.y));
+
+
+//	if ((uicol.r==1.0)&&(uicol.g==0.0)&&(uicol.b==1.0)) 
+	//	gl_FragColor = vec4(uix2,uiy2,1.0,1.0);
+//		gl_FragColor = basecol;
+//	else	
+//		gl_FragColor = uicol;
+
+gl_FragColor = vec4(1.0,1.0,1.0,1.0);
+}

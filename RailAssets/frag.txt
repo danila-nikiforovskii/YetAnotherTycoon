@@ -1,0 +1,125 @@
+#version 130
+uniform sampler2D texture;
+uniform int atlasx;
+uniform int atlasy;
+uniform int atlasx2;
+uniform int atlasy2;
+uniform int frame;
+uniform int seavar;
+uniform int seavar2;
+
+// flat shading
+uniform float dz1;
+uniform float dz2;
+uniform float dx1;
+uniform float dx2;
+uniform float dy1;
+uniform float dy2;
+
+uniform int mousemap;
+uniform int mousemapid;
+
+uniform vec4 tint;
+in vec3 avgnormal;
+
+uniform int allwhite;
+
+uniform int noshade;
+
+
+const float atlasw = 1024.0;
+const  float atlash = 1024.0;
+ const float spritew = 32.0;
+ const float spriteh = 32.0;
+
+ const int maxsprites = 31;//1024/32 - 1
+
+void main()
+{
+ 
+	vec4 col = texture2D(texture, vec2 ((atlasx+gl_TexCoord[0].x)*spritew/atlasw, ((maxsprites-atlasy)+(1.0-gl_TexCoord[0].y))*spriteh/atlash ));
+	
+	if (mousemap==0)
+		{
+
+
+			if ((col.r>0.99) && (col.g<0.01) && (col.b)>0.99)//magenta
+				
+				{
+					discard;
+				}
+	
+			else
+				{
+					
+						float tx = gl_TexCoord[0].x;
+						float ty = (1.0-gl_TexCoord[0].y);
+						
+						bool cyano = 	(col.r<0.01) && (col.g>0.99) && (col.b>0.99);
+							
+						if (cyano)//cyan
+							col = texture2D(texture, vec2 ((atlasx2+tx)*spritew/atlasw, ((maxsprites-atlasy2)+ty)*spriteh/atlash  ));
+						else
+							col = texture2D(texture, vec2 ((atlasx+tx)*spritew/atlasw, ((maxsprites-atlasy)+ty)*spriteh/atlash  ));
+						
+						
+						if ((atlasy == 4)&&(!cyano)) //water						
+						{
+							vec4 col2 = texture2D(texture, vec2 ((seavar2+tx)*spritew/atlasw, ((maxsprites-atlasy)+ty)*spriteh/atlash  ));							
+							float fl = float(frame%64)/63.0;							
+							col = col + (col2-col)*fl;							
+							//col = vec4(vec3(fl),1.0);
+						}
+						
+						if ((atlasy2 ==4)&&cyano) //water multitex
+						{
+							//vec4 col1 = texture2D(texture, vec2 ((atlasx2+tx)*spritew/atlasw, ((maxsprites-atlasy)+ty)*spriteh/atlash  ));							
+							vec4 col2 = texture2D(texture, vec2 ((seavar2+tx)*spritew/atlasw, ((maxsprites-atlasy2)+ty)*spriteh/atlash  ));							
+							float fl = float(frame%64)/63.0;							
+							col =col + (col2-col)*fl;
+						}
+						
+						if (noshade==0)
+						{
+						
+						vec4 temp = col;		
+						vec3 light = vec3(-1.0, 1.0, -2.0);
+						light = -normalize(light);
+			
+						vec3 v1 = vec3 (dx1,dy1,dz1*0.125);
+						vec3 v2 = vec3 (dx2,dy2,dz2*0.125);
+										
+						vec3 surfnormal = cross(v1,v2);
+						surfnormal = normalize(surfnormal);
+			
+						vec3 avgnormal2 = normalize(avgnormal);
+			
+						float blend = 0.29;
+						float shade  = blend*(abs( dot(light,surfnormal)))*(abs( dot(light,surfnormal))) + (1-blend)*(abs( dot(light,avgnormal2)));
+						float ambient = 0.01;
+						temp = temp*(ambient+(1.0-ambient)*shade); 
+					
+						if ( (tx< (1.0/32.0)) || (tx > (31.0/32.0)) ||(ty< (1.0/32.0)) || (ty > (31.0/32.0)))
+							gl_FragColor = vec4(temp.xyz*0.80,1.0);
+						else
+							gl_FragColor = vec4(temp.xyz,1.0);
+						}
+						else
+							 gl_FragColor = col*(1.0 - float(allwhite))+vec4(float(allwhite)*tint);
+						
+				}
+							
+		}
+else
+{
+	int r = mousemapid%256;	
+	int g =(mousemapid/256)%256;	
+	int b =(mousemapid/256)/256;
+	
+	if ((col.r>0.99) && (col.g<0.01) && (col.b)>0.99) //magenta
+		discard;
+	else
+		gl_FragColor = vec4 ( float(r)/255.0, float(g)/255.0, float(b)/255.0,1.0);
+	//gl_FragColor = vec4(1.0,1.0,0.0,1.0);
+}
+}

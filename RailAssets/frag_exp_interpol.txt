@@ -1,0 +1,79 @@
+#version 130
+uniform sampler2D texture;
+uniform int frame;
+void main()
+{
+
+
+if (frame == 255)
+	discard;
+else
+{
+const float maxframe = 256.0;
+
+
+const float rowcount = 4.0;
+const float colcount = 4.0;
+const float total = rowcount*colcount;
+const int framepersprite = int(floor(maxframe/total));
+
+int atlasx1 = int(floor(frame/maxframe*total)) % int(floor(colcount));
+int atlasy1 = int(floor(frame/maxframe*total)) / int(floor(colcount));
+
+int atlasx2 = (int(floor(frame/maxframe*total)) + 1) % int(floor(colcount));
+int atlasy2 = (int(floor(frame/maxframe*total)) + 1) / int(floor(colcount));
+
+
+
+
+
+vec4 col1 = texture2D(texture, vec2 (( atlasx1+gl_TexCoord[0].x)/colcount, ((rowcount-1-atlasy1)+gl_TexCoord[0].y)/rowcount  ));
+
+
+
+
+vec4 col2 = texture2D(texture, vec2 (( atlasx2+gl_TexCoord[0].x)/colcount, ((rowcount-1-atlasy2)+gl_TexCoord[0].y)/rowcount  ));
+
+
+
+
+
+bool transp1 = (col1.r>0.99) && (col1.g<0.01) && (col1.b>0.99);
+bool transp2 = (col2.r>0.99) && (col2.g<0.01) && (col2.b>0.99);
+
+
+
+
+if (transp1 && transp2) 
+	discard;
+else
+{
+	if (transp1)
+		if (atlasy2==int(rowcount))
+			discard;
+		else
+			gl_FragColor = col2;
+
+		
+
+	if (transp2)
+		if (atlasy2==int(rowcount))
+			discard;
+		else
+			gl_FragColor = col1;
+
+
+
+	if (!transp1 && !transp2)
+		if (atlasy2==int(rowcount))
+			discard;
+		else
+			gl_FragColor = col1 + (col2-col1)*float((frame%(framepersprite)))/float(framepersprite);
+		
+
+
+
+
+}
+}
+}

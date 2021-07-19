@@ -1,0 +1,111 @@
+#version 130
+uniform sampler2D texture;
+uniform sampler2D uitexture;
+
+uniform float width;
+uniform float height;
+
+uniform float element_x;
+uniform float element_y;
+uniform float element_w;
+uniform float element_h;
+
+uniform float element_screen_x;
+uniform float element_screen_y;
+uniform float element_screen_w;
+uniform float element_screen_h;
+
+uniform vec3 tint;
+in vec2 uv;
+
+
+uniform float id_r;
+uniform float id_g;
+uniform float id_b;
+uniform int highlight;
+uniform int ifmm;
+void main()
+{
+
+vec4 mixcolor = vec4 (tint,1.0);
+
+	vec4 uicol = texture2D(uitexture, vec2 (gl_TexCoord[0].x, gl_TexCoord[0].y ));
+	vec4 basecol = texture2D(texture, uv);
+
+	if (((uicol.r==1.0)&&(uicol.g==240.0f/255.0f)&&(uicol.b==1.0)) || 
+	   ((uicol.r==1.0)&&(uicol.g==0.0f)&&(uicol.b==1.0) ))
+		discard;
+	else {
+	
+	if (true){
+
+	if (ifmm==1)
+		{
+			gl_FragColor = vec4(id_r,id_g,id_b,1.0);
+		}
+	else
+	{
+
+
+	if ((uicol.r==0.0)&&(uicol.g==uicol.b)) 
+ 			gl_FragColor = basecol*uicol.g + mixcolor*(1.0-uicol.g);
+		
+
+	else	
+		{
+	        	if ((uicol.g==uicol.r)&&(uicol.b!=uicol.r)) {
+
+			float atlas_w = 1024;
+			float atlas_h = 1024;
+			float screen_w = 1280;
+			float screen_h = 720;
+
+			float backdrop_basex = 0;
+			float backdrop_basey = 0;
+			float backdrop_w = 512;
+			float backdrop_h = 384;
+
+			float dx = (gl_TexCoord[0].x - element_x/atlas_w )/(element_w/atlas_w);
+			float dy = ( (1.0 - gl_TexCoord[0].y) - element_y/atlas_h)/(element_h/atlas_h);
+
+			float newx = backdrop_basex + (element_screen_x + element_screen_w*dx)/screen_w*backdrop_w;
+			float newy = backdrop_basey + (element_screen_y + element_screen_h*dy)/screen_h*backdrop_h;
+
+			newx = newx/atlas_w;
+			newy = 1.0 - newy/atlas_h;
+			
+ 			vec4 col = texture2D(uitexture, vec2 ( newx,newy));
+
+			if ((uicol.b==0))
+				gl_FragColor = col;
+			else
+				{float lum = col.x*0.299+ col.y*0.587+ col.z*0.114;
+					
+					
+					gl_FragColor = vec4( (col.xyz*0.75 +vec3(0.75*(1-0.75)))*uicol.b*2.0f ,1.0);
+				}
+			}
+			else
+			{	
+					
+					if ((highlight!=0)&& (uicol.r==79.0f/255.0f) && (uicol.g==55.0f/255.0f) && (uicol.b==43.0f/255.0f)) 
+					{
+						//gl_FragColor = vec4 (213.0f/255.0f,202.0f/255.0f,0.0,1.0);
+						gl_FragColor = vec4(1.0,1.0,1.0,1.0);
+						//gl_FragColor = vec4 (2.9*79.0f/255.0f,2.9*55.0f/255.0f,2.9*43.0f/255.0f,1.0);
+						//gl_FragColor = vec4 (1.2*213.0f/255.0f,1.2*202.0f/255.0f,0.0,1.0);
+						//gl_FragColor = uicol;
+					}
+					else{
+						gl_FragColor = uicol;
+					//	gl_FragColor = vec4 (1.0,0.0,0.0,1.0);
+					}
+			}
+		}
+		}
+		}
+		else	
+			{gl_FragColor = vec4 (1.0,1.0,1.0,1.0);
+			}
+	}
+}

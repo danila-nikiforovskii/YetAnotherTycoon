@@ -1,0 +1,18 @@
+#version 130
+uniform float width;
+uniform float height;
+
+out vec2 uv;
+uniform mat4 orthomat;
+
+void main()
+{
+			gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+//			gl_Position = orthomat * gl_Vertex;
+
+			uv.x = gl_Vertex.x/width;				
+			uv.y = (height-gl_Vertex.y)/height;
+		
+			gl_FrontColor = gl_Color;
+            gl_TexCoord[0] = gl_MultiTexCoord0;
+}

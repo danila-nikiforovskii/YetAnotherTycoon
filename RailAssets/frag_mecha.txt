@@ -1,0 +1,56 @@
+#version 130
+uniform sampler2D texture;
+uniform int frame;
+uniform int lequip;
+uniform int requip;
+uniform int direction;
+uniform int crouched;
+uniform int isstill;
+void main()
+{
+
+
+
+const float rowcount = 6.0;
+const float colcount = 11.0;
+const float total = rowcount*colcount;
+
+bool still = isstill==1;
+
+
+int atlasx = 0;
+int atlasy = 0;
+
+
+
+if (still)
+{
+	atlasx = 0;
+	atlasy = direction;
+}
+else
+{
+	atlasx = 1+frame%10;
+	atlasy = direction;
+}
+
+
+vec4 body = texture2D(texture, vec2 (( atlasx+gl_TexCoord[0].x)/colcount, ((rowcount-1-atlasy)+gl_TexCoord[0].y)/rowcount  ));
+
+
+
+
+
+if ((body.r>0.99) && (body.g<0.01) && (body.b>0.99))
+{
+      discard;       
+}
+else
+{gl_FragColor = body;  }
+
+
+
+
+
+
+}

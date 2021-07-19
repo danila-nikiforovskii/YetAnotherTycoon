@@ -1,0 +1,29 @@
+#version 130
+
+ // in float z0;
+// in float zup;
+// in float zdown;
+// in float zleft;
+// in float zright;
+
+out vec3 avgnormal;
+void main()
+{
+
+			//vec3 vecup = vec3 (0.0,1.0,zup-z0);
+			//vec3 vecdown = vec3 (0.0,-1.0,zdown-z0);
+			//vec3 vecright = vec3 (1.0,0.0,zright-z0);
+			//vec3 vecleft = vec3 (-1.0,0.0,zleft-z0);
+
+			//vec3 nupleft = cross(vecleft,vecup);
+			//vec3 nupright = cross(vecup,vecright);
+			//vec3 ndownleft = cross(vecdown,vecleft);
+			//vec3 ndownright = cross(vecright,vecdown);
+
+                       // avgnormal = normalize(nupleft+nupright+ndownleft+ndownright);
+
+ 			avgnormal = normalize(gl_Normal);
+			gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+			gl_FrontColor = gl_Color;
+            		gl_TexCoord[0] = gl_MultiTexCoord0;
+}

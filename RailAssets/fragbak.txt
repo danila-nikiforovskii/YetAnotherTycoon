@@ -1,0 +1,62 @@
+#version 130
+uniform sampler2D texture;
+uniform int atlasx;
+uniform int atlasy;
+uniform int atlasx2;
+uniform int atlasy2;
+uniform int frame;
+uniform int seavar;
+uniform int seavar2;
+void main()
+{
+
+vec4 col = texture2D(texture, vec2 ((atlasx+gl_TexCoord[0].x)*0.0625, ((63-atlasy)+gl_TexCoord[0].y)*0.03125*0.5 ));
+if ((col.r>0.99) && (col.g<0.01) && (col.b)>0.99)
+	discard;
+else
+if ((col.r<0.01) && (col.g>0.99) && (col.b)>0.99)
+
+if (atlasy2!=7)
+	gl_FragColor = texture2D(texture, vec2 ((atlasx2+gl_TexCoord[0].x)*0.0625, ((63-atlasy2)+gl_TexCoord[0].y)*0.03125*0.5 ));
+else
+{
+
+int xtransit = frame%50;
+
+vec4 col1 = texture2D(texture, vec2 (( (seavar)+gl_TexCoord[0].x)*0.0625, ((63-atlasy2)+gl_TexCoord[0].y)*0.03125*0.5  ));
+
+
+vec4 col2 = texture2D(texture, vec2 (((seavar2)+gl_TexCoord[0].x)*0.0625, ((63-atlasy2)+gl_TexCoord[0].y)*0.03125*0.5  ));
+
+gl_FragColor = col1 + (col2-col1)*xtransit/49.0;
+
+}
+
+else
+if ((col.r>0.99)&&(col.g>0.99)&&(col.b)<0.01)
+	gl_FragColor = vec4 (   texture2D(texture, vec2 ((atlasx2+gl_TexCoord[0].x)*0.0625, ((63-atlasy2)+gl_TexCoord[0].y)*0.03125*0.5  )).x +0.2 , 
+ texture2D(texture, vec2 ((atlasx2+gl_TexCoord[0].x)*0.0625, ((31-atlasy2)+gl_TexCoord[0].y)*0.03125 )).y +0.2 , 
+ texture2D(texture, vec2 ((atlasx2+gl_TexCoord[0].x)*0.0625, ((31-atlasy2)+gl_TexCoord[0].y)*0.03125 )).z +0.2 , 
+ texture2D(texture, vec2 ((atlasx2+gl_TexCoord[0].x)*0.0625, ((31-atlasy2)+gl_TexCoord[0].y)*0.03125 )).w       );
+else
+if (atlasy!=7)
+	gl_FragColor = texture2D(texture, vec2 ((atlasx+gl_TexCoord[0].x)*0.0625, ((63-atlasy)+gl_TexCoord[0].y)*0.03125*0.5  ));
+else
+
+{
+
+
+int xtransit = frame%50;
+
+vec4 col1 = texture2D(texture, vec2 (( (seavar)+gl_TexCoord[0].x)*0.0625, ((63-atlasy)+gl_TexCoord[0].y)*0.03125*0.5  ));
+
+
+vec4 col2 = texture2D(texture, vec2 (((seavar2)+gl_TexCoord[0].x)*0.0625, ((63-atlasy)+gl_TexCoord[0].y)*0.03125*0.5  ));
+
+gl_FragColor = col1 + (col2-col1)*xtransit/49.0;
+
+
+
+}
+
+}

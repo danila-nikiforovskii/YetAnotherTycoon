@@ -1,0 +1,48 @@
+#version 130
+uniform sampler2D texture;
+uniform sampler2D towntexture;
+uniform int atlasx;
+uniform int atlasy;
+uniform float frame;
+uniform int skew1;
+uniform int istree;
+
+
+#define PI 3.1415926535897932384626433832795
+
+void main()
+{
+bool tree = istree==1;
+
+if (tree) {
+
+vec2 coords = vec2(gl_TexCoord[0].x,gl_TexCoord[0].y);
+coords.x = coords.x + 0.008*(skew1*sin(frame/5000.0*2*PI))*(coords.y)*(coords.y);
+vec4 col = texture2D(texture, vec2 ((atlasx+coords.x)*0.03125, ((15-atlasy)+coords.y)*0.0625 ));
+if ( ((col.r>0.99) && (col.g<0.01) && (col.b)>0.99) || ((atlasx+coords.x)*0.03125<0)|| ((atlasx+coords.x)*0.03125>1.0))
+	discard;
+else
+
+
+//	gl_FragColor = vec4(col.g+0.18*col.r,col.g+0.18*col.r,col.b,1.0);
+	gl_FragColor = col;
+
+}
+else
+{
+
+
+vec2 coords = vec2(gl_TexCoord[0].x,gl_TexCoord[0].y);
+
+vec4 col = texture2D(texture, vec2 ((atlasx+coords.x)*0.125*0.5, ((7-(atlasy+7))+coords.y)*0.125 ));
+if ( (col.r>0.99) && (col.g<0.01) && (col.b>0.99))
+	discard;
+else
+
+	gl_FragColor = col;
+
+
+}
+
+
+}

@@ -1,0 +1,20 @@
+#version 130
+ in vec2 mycoords;
+ in vec2 mytexcoords;
+ in vec2 myscreentexcoords;
+
+out vec2 tx1;
+out vec2 tx2;
+
+uniform mat4 orthomat;
+
+void main()
+{
+		
+
+//		gl_Position = orthomat*vec4(mycoords.xy,1.0,0.0);		
+		gl_Position = gl_ModelViewProjectionMatrix*vec4(mycoords.xy,1.0,0.0);		
+ 
+		tx1 = mytexcoords;
+		tx2 = myscreentexcoords;
+}

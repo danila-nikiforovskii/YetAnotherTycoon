@@ -1,0 +1,68 @@
+#version 130
+uniform sampler2D texture;
+uniform sampler2D texture_base;
+
+uniform int atlasx;
+uniform int atlasy;
+
+
+uniform int atlasx_red;
+uniform int atlasy_red;
+uniform int atlasx_cyan;
+uniform int atlasy_cyan;
+uniform int atlasx_green;
+uniform int atlasy_green;
+uniform int isb;
+
+
+
+void main()
+{
+
+
+vec2 tex = vec2(gl_TexCoord[0].x,gl_TexCoord[0].y);
+
+
+vec4 col = texture2D(texture, vec2 ((atlasx+tex.x)*0.125, ((7-atlasy)+tex.y)*0.125 ));
+if  (  ((col.r>0.99) && (col.g<0.01) && (col.b)>0.99)||((col.r<0.01) && (col.g<0.01) && (col.b<0.01))  )
+	discard;
+else
+{
+	
+
+	if  ((col.r>0.99) && (col.g<0.01) && (col.b<0.01))
+		{	
+			if (isb!=1)
+				col =texture2D(texture_base, vec2    ( (atlasx_red+ fract(0.25+0.5*(tex.x-0.5))  )*0.125*0.5, ( (63-atlasy_red)+fract(tex.y-0.5) )*0.125*0.25*0.5));
+			else
+				col =texture2D(texture_base, vec2  ( (atlasx_red+ fract(0.75+0.5*(0.5-tex.x)) ) *0.125*0.5, ( (63-atlasy_red)+fract(tex.y-0.5) )*0.125*0.25*0.5));	
+				//col  = vec4 ( fract(0.75+0.5*(0.5-tex.x)) ,0.0,0.0,0.0);
+
+		}
+	else
+		{
+		
+			if  ((col.r<0.01) && (col.g>0.99) && (col.b<0.01))
+				{
+					if (isb!=1)
+						col =texture2D(texture_base, vec2 ((atlasx_green+ fract(0.25+0.5*(tex.x-0.5)))*0.125*0.5, ((63-atlasy_green)+fract(0.5+tex.y))*0.125*0.25*0.5));
+					else
+						col =texture2D(texture_base, vec2 ((atlasx_green+ fract(0.75+0.5*(0.5-tex.x)))*0.125*0.5, ((63-atlasy_green)+fract(0.5+tex.y))*0.125*0.25*0.5));	
+				}
+			else
+				{
+					if  ((col.r<0.01) && (col.g>0.99) && (col.b>0.99))
+					if (isb!=1)
+						col =texture2D(texture_base, vec2 ((atlasx_cyan+ fract(1.0 +0.5*(tex.x-0.5)))*0.125*0.5, ((63-atlasy_cyan)+fract(tex.y))*0.125*0.25*0.5));			
+					else
+						col =texture2D(texture_base, vec2 ((atlasx_cyan+fract( 0.5*(0.5-tex.x)))*0.125*0.5, ((63-atlasy_cyan)+fract(tex.y))*0.125*0.25*0.5));			
+						
+				}
+
+
+		}
+
+		gl_FragColor = col;
+
+}
+}
