@@ -222,6 +222,76 @@ void DMainScreen::PREPARE_MAGNETS_U()
                   }
           }
 
+
+      // s-curve into the split....
+
+      if  (NNode->u==nullptr)
+          {
+
+              if  (  ((HorizontalSideNodes[RailStart.i-1][RailStart.j-3].d!=nullptr) &&  (HorizontalSideNodes[RailStart.i-1][RailStart.j-3].d->type==straightVert))||
+                     ((HorizontalSideNodes[RailStart.i-1][RailStart.j-2].d!=nullptr) &&  (HorizontalSideNodes[RailStart.i-1][RailStart.j-2].d->type==straightVert)) )
+                  {
+
+
+                      DMagnet * newmagnet = new DMagnet;
+                      newmagnet->address.i=RailStart.i-1;
+                      newmagnet->address.j=RailStart.j-3;
+                      newmagnet->address.type=NetworkNodeTypes::horiz;
+                      newmagnet->newelement = new class splitD_R();
+                      static_cast<class splitD_R*>(newmagnet->newelement)->dr=NNode;
+                      static_cast<class splitD_R*>(newmagnet->newelement)->u=&(HorizontalSideNodes[RailStart.i-1][RailStart.j-3]);
+                      static_cast<class splitD_R*>(newmagnet->newelement)->d=&(HorizontalSideNodes[RailStart.i-1][RailStart.j-1]);
+                      static_cast<class splitD_R*>(newmagnet->newelement)->i = RailStart.i-1;
+                      static_cast<class splitD_R*>(newmagnet->newelement)->j = RailStart.j-3;
+                      newmagnet->valid = check_obstruction(newmagnet->newelement);
+
+                      QList<DNetworkListElement*> allowed;
+
+                      if((HorizontalSideNodes[RailStart.i-1][RailStart.j-3].d!=nullptr) && (HorizontalSideNodes[RailStart.i-1][RailStart.j-3].d->type==straightVert))
+                          allowed.append(HorizontalSideNodes[RailStart.i-1][RailStart.j-3].d);
+
+                      if((HorizontalSideNodes[RailStart.i-1][RailStart.j-2].d!=nullptr) && (HorizontalSideNodes[RailStart.i-1][RailStart.j-2].d->type==straightVert))
+                          allowed.append(HorizontalSideNodes[RailStart.i-1][RailStart.j-2].d);
+
+                      newmagnet->valid=check_obstruction_conditional(newmagnet->newelement,allowed);
+                      magnets.append(newmagnet);
+                  }
+
+
+              if  (  ((HorizontalSideNodes[RailStart.i+1][RailStart.j-3].d!=nullptr) &&  (HorizontalSideNodes[RailStart.i+1][RailStart.j-3].d->type==straightVert))||
+                     ((HorizontalSideNodes[RailStart.i+1][RailStart.j-2].d!=nullptr) &&  (HorizontalSideNodes[RailStart.i+1][RailStart.j-2].d->type==straightVert)) )
+                  {
+
+
+                      DMagnet * newmagnet = new DMagnet;
+                      newmagnet->address.i=RailStart.i+1;
+                      newmagnet->address.j=RailStart.j-3;
+                      newmagnet->address.type=NetworkNodeTypes::horiz;
+                      newmagnet->newelement = new class splitD_L();
+                      static_cast<class splitD_L*>(newmagnet->newelement)->dl=NNode;
+                      static_cast<class splitD_L*>(newmagnet->newelement)->u=&(HorizontalSideNodes[RailStart.i+1][RailStart.j-3]);
+                      static_cast<class splitD_L*>(newmagnet->newelement)->d=&(HorizontalSideNodes[RailStart.i+1][RailStart.j-1]);
+                      static_cast<class splitD_L*>(newmagnet->newelement)->i = RailStart.i;
+                      static_cast<class splitD_L*>(newmagnet->newelement)->j = RailStart.j-3;
+                      newmagnet->valid = check_obstruction(newmagnet->newelement);
+
+                      QList<DNetworkListElement*> allowed;
+
+                      if((HorizontalSideNodes[RailStart.i+1][RailStart.j-3].d!=nullptr) && (HorizontalSideNodes[RailStart.i+1][RailStart.j-3].d->type==straightVert))
+                          allowed.append(HorizontalSideNodes[RailStart.i+1][RailStart.j-3].d);
+
+                      if((HorizontalSideNodes[RailStart.i+1][RailStart.j-2].d!=nullptr) && (HorizontalSideNodes[RailStart.i+1][RailStart.j-2].d->type==straightVert))
+                          allowed.append(HorizontalSideNodes[RailStart.i+1][RailStart.j-2].d);
+
+                      newmagnet->valid=check_obstruction_conditional(newmagnet->newelement,allowed);
+                      magnets.append(newmagnet);
+                  }
+
+          }
+
+
+
+
       // ==== UP - UPGRADE VERT TO JUNCTIONS =============
 
       if ( (NNode->u!=nullptr) && (NNode->u->type==straightVert))
@@ -262,7 +332,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
               newmagnet->newelement = new class junctionU_UR();
 
               static_cast<class junctionU_UR*>(newmagnet->newelement)->d=NNode;
-              static_cast<class junctionU_UR*>(newmagnet->newelement)->u=&(HorizontalSideNodes[RailStart.i][RailStart.j-2]);;
+              static_cast<class junctionU_UR*>(newmagnet->newelement)->u=&(HorizontalSideNodes[RailStart.i][RailStart.j-2]);
               static_cast<class junctionU_UR*>(newmagnet->newelement)->ur=&(CornerNodes[RailStart.i+2][RailStart.j-3]);
 
               static_cast<class junctionU_UR*>(newmagnet->newelement)->i = RailStart.i;
@@ -277,6 +347,67 @@ void DMainScreen::PREPARE_MAGNETS_U()
 
               magnets.append(newmagnet);
           }
+
+
+      // =========== UPGRADE UP TO SPLITS ===============
+
+      if ( (NNode->u!=nullptr) && (NNode->u->type==straightVert))
+          {
+                    DMagnet * newmagnet = new DMagnet;
+                    newmagnet->address.i=RailStart.i-1;
+                    newmagnet->address.j=RailStart.j-3;
+                    newmagnet->address.type=NetworkNodeTypes::horiz;
+                    newmagnet->newelement = new class splitU_L();
+
+                    static_cast<class splitU_L*>(newmagnet->newelement)->d=NNode;
+                    static_cast<class splitU_L*>(newmagnet->newelement)->u=&(HorizontalSideNodes[RailStart.i][RailStart.j-2]);
+                    static_cast<class splitU_L*>(newmagnet->newelement)->ul=&(HorizontalSideNodes[RailStart.i-1][RailStart.j-3]);
+
+                    static_cast<class splitU_L*>(newmagnet->newelement)->i = RailStart.i-1;
+                    static_cast<class splitU_L*>(newmagnet->newelement)->j = RailStart.j-3;
+
+                    QList<DNetworkListElement*> allowed;
+                    allowed.append(NNode->u);
+
+                    if  ( (HorizontalSideNodes[RailStart.i][RailStart.j-1].u!=nullptr)&&(HorizontalSideNodes[RailStart.i][RailStart.j-1].u->type==straightVert) )
+                        allowed.append(HorizontalSideNodes[RailStart.i][RailStart.j-1].u);
+
+
+                    newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
+
+                    magnets.append(newmagnet);
+
+          }
+
+      if ( (NNode->u!=nullptr) && (NNode->u->type==straightVert))
+          {
+                    DMagnet * newmagnet = new DMagnet;
+                    newmagnet->address.i=RailStart.i+1;
+                    newmagnet->address.j=RailStart.j-3;
+                    newmagnet->address.type=NetworkNodeTypes::horiz;
+                    newmagnet->newelement = new class splitU_R();
+
+                    static_cast<class splitU_R*>(newmagnet->newelement)->d=NNode;
+                    static_cast<class splitU_R*>(newmagnet->newelement)->u=&(HorizontalSideNodes[RailStart.i][RailStart.j-2]);
+                    static_cast<class splitU_R*>(newmagnet->newelement)->ur=&(HorizontalSideNodes[RailStart.i+1][RailStart.j-3]);
+
+                    static_cast<class splitU_R*>(newmagnet->newelement)->i = RailStart.i;
+                    static_cast<class splitU_R*>(newmagnet->newelement)->j = RailStart.j-3;
+
+                    QList<DNetworkListElement*> allowed;
+                    allowed.append(NNode->u);
+
+                    if  ( (HorizontalSideNodes[RailStart.i][RailStart.j-1].u!=nullptr)&&(HorizontalSideNodes[RailStart.i][RailStart.j-1].u->type==straightVert) )
+                        allowed.append(HorizontalSideNodes[RailStart.i][RailStart.j-1].u);
+
+                     newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
+
+                    magnets.append(newmagnet);
+
+          }
+
+
+
 
       // ==== UP - UPGRADE  tight U UL TO JUNCTION =============
       if ( (NNode->u!=nullptr) && (NNode->u->type==tight_DR_D))
