@@ -390,6 +390,7 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
 
             newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
             magnets.append(newmagnet);
+
             }
         }
 
@@ -468,26 +469,27 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
 
             else
                 {
-            DMagnet * newmagnet = new DMagnet;
-            newmagnet->address.i=RailStart.i+2;
-            newmagnet->address.j=RailStart.j-2;
-            newmagnet->address.type=NetworkNodeTypes::corner;
-            newmagnet->newelement = new class junctionUR_R();
+                    DMagnet * newmagnet = new DMagnet;
+                    newmagnet->address.i=RailStart.i+2;
+                    newmagnet->address.j=RailStart.j-2;
+                    newmagnet->address.type=NetworkNodeTypes::corner;
+                    newmagnet->newelement = new class junctionUR_R();
 
-            static_cast<class junctionUR_R*>(newmagnet->newelement)->dl=NNode;
-            static_cast<class junctionUR_R*>(newmagnet->newelement)->ur=&(CornerNodes[RailStart.i+2][RailStart.j-2]);
-            static_cast<class junctionUR_R*>(newmagnet->newelement)->r=&(VerticalSideNodes[RailStart.i+3][RailStart.j-2]);
-            static_cast<class junctionUR_R*>(newmagnet->newelement)->i = RailStart.i;
-            static_cast<class junctionUR_R*>(newmagnet->newelement)->j = RailStart.j-2;
+                    static_cast<class junctionUR_R*>(newmagnet->newelement)->dl=NNode;
+                    static_cast<class junctionUR_R*>(newmagnet->newelement)->ur=&(CornerNodes[RailStart.i+2][RailStart.j-2]);
+                    static_cast<class junctionUR_R*>(newmagnet->newelement)->r=&(VerticalSideNodes[RailStart.i+3][RailStart.j-2]);
+                    static_cast<class junctionUR_R*>(newmagnet->newelement)->i = RailStart.i;
+                    static_cast<class junctionUR_R*>(newmagnet->newelement)->j = RailStart.j-2;
 
-            QList<DNetworkListElement*> allowed;
-            allowed.append(NNode->ur);
+                    QList<DNetworkListElement*> allowed;
+                    allowed.append(NNode->ur);
 
-            if ((CornerNodes[RailStart.i+2][RailStart.j-2].dl!=nullptr)&&(CornerNodes[RailStart.i+2][RailStart.j-2].dl->type==diagURDL))
-                allowed.append(CornerNodes[RailStart.i+2][RailStart.j-2].dl);
+                    if ((CornerNodes[RailStart.i+2][RailStart.j-2].dl!=nullptr)&&(CornerNodes[RailStart.i+2][RailStart.j-2].dl->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i+2][RailStart.j-2].dl);
 
-            newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
-            magnets.append(newmagnet);
+                    newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
+                    magnets.append(newmagnet);
+
                 }
         }
 

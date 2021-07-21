@@ -502,7 +502,7 @@ public:
                          type = RailTypes::junction_UR_U;
                        }
                        void LinkNodes(){ dl->ur=this;ur->dl=this;u->d=this;}
-                       void kill(){ ur->dl=nullptr;ur->dl=nullptr;u->d=nullptr;erase();}
+                       void kill(){ dl->ur=nullptr;ur->dl=nullptr;u->d=nullptr;erase();}
                        void killUpgraded(){
 
                            if (ur->dl!=nullptr) ur->dl->kill();
@@ -526,7 +526,7 @@ class junctionUR_R: public DNetworkListElement
                          type = RailTypes::junction_UR_R;
                        }
                        void LinkNodes(){ dl->ur=this;ur->dl=this;r->l=this;}
-                       void kill(){ ur->dl=nullptr;ur->dl=nullptr;r->l=nullptr;erase();}
+                       void kill(){ dl->ur=nullptr;ur->dl=nullptr;r->l=nullptr;erase();}
                        void killUpgraded(){
 
                            if (ur->dl!=nullptr) ur->dl->kill();
@@ -604,8 +604,8 @@ class junctionDR_R: public DNetworkListElement
                            AppendFULL(0,0);AppendFULL(1,1);AppendDR(1,0);AppendFULL(2,1);
                          type = RailTypes::junction_DR_D;
                        }
-                       void LinkNodes(){ ul->dr=this;ul->dr=this;r->l=this;}
-                       void kill(){ ul->dr=nullptr;ul->dr=nullptr;r->l=nullptr;erase();}
+                       void LinkNodes(){ ul->dr=this;dr->ul=this;r->l=this;}
+                       void kill(){ ul->dr=nullptr;dr->ul=nullptr;r->l=nullptr;erase();}
                        void killUpgraded(){
 
                            if (ul->dr!=nullptr) ul->dr->kill();
@@ -629,8 +629,8 @@ public:
                            AppendFULL(0,0);AppendFULL(1,1);AppendUR(0,1);AppendFULL(1,2);
                          type = RailTypes::junction_DR_D;
                        }
-                       void LinkNodes(){ ul->dr=this;ul->dr=this;d->u=this;}
-                       void kill(){ ul->dr=nullptr;ul->dr=nullptr;d->u=nullptr;erase();}
+                       void LinkNodes(){ ul->dr=this;dr->ul=this;d->u=this;}
+                       void kill(){ ul->dr=nullptr;dr->ul=nullptr;d->u=nullptr;erase();}
                        void killUpgraded(){
 
                            if (ul->dr!=nullptr) ul->dr->kill();
