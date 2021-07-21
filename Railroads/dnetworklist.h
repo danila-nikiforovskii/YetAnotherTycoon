@@ -113,7 +113,13 @@ enum RailTypes
     Xjunction_U,
     Xjunction_UR,
     Xjunction_R,
-    xjunction_DR
+    xjunction_DR,
+
+    TwoTrackJunctionU_UL,
+    TwoTrackJunctionU_UR,
+    TwoTrackJunctionUR_U,
+    TwoTrackJunctionUR_R
+
 
     // PLACEHOLDERS for crossings, X-junctions et al.
 };
@@ -1692,6 +1698,181 @@ class NjunctionDL: public DNetworkListElement
         DCornerNode *urr;
 };
 
+// double junctions U UL
+class TwoTrackJunctionU_UL: public DNetworkListElement
+{
+    public:
+        TwoTrackJunctionU_UL() {
+               ax = 1;
+               ay = 26;
+               bx = 3;
+               by = 28;
+               rot = d270;
+
+                AppendFULL(0,0);AppendFULL(1,0);AppendFULL(2,0);
+                  AppendUR(0,1);AppendFULL(1,1);AppendFULL(2,1);
+                                AppendFULL(1,2);AppendFULL(2,2);
+
+
+            type = RailTypes::TwoTrackJunctionU_UL;
+        }
+
+        void LinkNodes(){
+            dl->u = this; ul->d = this;
+            dr->u = this; ur->d = this;
+
+            ull->dr = this; ulr->dr = this;
+        }
+
+        void kill(){
+            dl->u = nullptr; ul->d = nullptr;
+            dr->u = nullptr; ur->d = nullptr;
+
+            ull->dr = nullptr; ulr->dr = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+            if (dl->u!=nullptr) dl->u->kill();
+            if (dr->u!=nullptr) dr->u->kill();
+            if (ul->d!=nullptr) ul->d->kill();
+            if (ur->d!=nullptr) ur->d->kill();
+            if (ull->dr!=nullptr) ull->dr->kill();
+            if (ulr->dr!=nullptr) ulr->dr->kill();
+
+            if (ml->d!=nullptr) ml->d->kill();
+            if (mr->d!=nullptr) mr->d->kill();
+        }
+
+        DHorizontalSideNode *dl;
+        DHorizontalSideNode *dr;
+
+        DHorizontalSideNode *ml;
+        DHorizontalSideNode *mr;
+
+        DHorizontalSideNode *ul;
+        DHorizontalSideNode *ur;
+
+        DCornerNode *ull;
+        DCornerNode *ulr;
+};
+
+
+// double junctions U UR
+class TwoTrackJunctionU_UR: public DNetworkListElement
+{
+    public:
+        TwoTrackJunctionU_UR() {
+               ax = 1;
+               ay = 26;
+               bx = 3;
+               by = 28;
+               rot = m90;
+
+                AppendFULL(0,0);AppendFULL(1,0);AppendFULL(2,0);
+                  AppendFULL(0,1);AppendFULL(1,1);AppendUL(2,1);
+                                AppendFULL(0,2);AppendFULL(1,2);
+
+
+            type = RailTypes::TwoTrackJunctionU_UR;
+        }
+
+        void LinkNodes(){
+            dl->u = this; ul->d = this;
+            dr->u = this; ur->d = this;
+
+            url->dl = this; urr->dl = this;
+        }
+
+        void kill(){
+            dl->u = nullptr; ul->d = nullptr;
+            dr->u = nullptr; ur->d = nullptr;
+
+            url->dl = nullptr; urr->dl = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+            if (dl->u!=nullptr) dl->u->kill();
+            if (dr->u!=nullptr) dr->u->kill();
+            if (ul->d!=nullptr) ul->d->kill();
+            if (ur->d!=nullptr) ur->d->kill();
+            if (url->dl!=nullptr) url->dl->kill();
+            if (urr->dl!=nullptr) urr->dl->kill();
+
+            if (ml->d!=nullptr) ml->d->kill();
+            if (mr->d!=nullptr) mr->d->kill();
+        }
+
+        DHorizontalSideNode *dl;
+        DHorizontalSideNode *dr;
+
+        DHorizontalSideNode *ml;
+        DHorizontalSideNode *mr;
+
+        DHorizontalSideNode *ul;
+        DHorizontalSideNode *ur;
+
+        DCornerNode *url;
+        DCornerNode *urr;
+};
+
+
+// double junctions UR R
+class TwoTrackJunctionUR_R: public DNetworkListElement
+{
+    public:
+        TwoTrackJunctionUR_R() {
+               ax = 4;
+               ay = 23;
+               bx = 6;
+               by = 25;
+               rot = m0;
+
+                AppendFULL(1,0);AppendFULL(2,0);
+                  AppendFULL(0,1);AppendFULL(1,1);AppendUL(2,1);
+                  AppendFULL(0,2);AppendUL(1,2);
+
+
+            type = RailTypes::TwoTrackJunctionUR_R;
+        }
+
+        void LinkNodes(){
+            dlu->ur = this; dld->ur = this;
+            url->dl = this; urr->dl = this;
+
+            ru->l = this;rd->l = this;
+        }
+
+        void kill(){
+            dlu->ur = nullptr; dld->ur = nullptr;
+            url->dl = nullptr; urr->dl = nullptr;
+
+            ru->l = nullptr;rd->l = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+            if (dlu->ur!=nullptr) dlu->ur->kill();
+            if (dld->ur!=nullptr) dld->ur->kill();
+            if (url->dl!=nullptr) url->dl->kill();
+            if (urr->dl!=nullptr) urr->dl->kill();
+            if (ru->l!=nullptr) ru->l->kill();
+            if (rd->l!=nullptr) rd->l->kill();
+
+            //if (ml->d!=nullptr) ml->d->kill();
+            //if (mr->d!=nullptr) mr->d->kill();
+        }
+
+        DCornerNode *dlu;
+        DCornerNode *dld;
+
+        DCornerNode *url;
+        DCornerNode *urr;
+
+        DVerticalSideNode *ru;
+        DVerticalSideNode *rd;
+};
 
 
 // ====================== END =====================
