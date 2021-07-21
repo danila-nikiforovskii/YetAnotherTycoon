@@ -121,7 +121,7 @@ void DMainScreen::GAMEPLAY_MAIN_MAPINIT()
       for(int j=0;j<HEIGHT;j++)
           {
                 VerticalSideNodes[i][j].i = i;
-                VerticalSideNodes[i][j].j = j;
+                VerticalSideNodes[i][j].j = j;               
           }
 
 
@@ -815,8 +815,8 @@ void DMainScreen::RENDER_BASIC_multiquad(int x_ul, int y_ul, int tx_ul, int ty_u
 
 void DMainScreen::RENDER_GRID()
 {
-    for (uint ii01 = 0; ii01 < 25; ii01++)
-        for (uint jj01 = 0; jj01 < 25; jj01++)
+    for (uint ii01 = 0; ii01 < HORIZONTAL_TO_DRAW; ii01++)
+        for (uint jj01 = 0; jj01 < VERTICAL_TO_DRAW; jj01++)
             {
                 shader->setUniformValue(shader->uniformLocation("atlasy"), 9);
                 shader->setUniformValue(shader->uniformLocation("atlasx"), 9);
@@ -830,8 +830,8 @@ void DMainScreen::RENDER_DRAW_TERRAIN(int mod)
 
 
 
-    for (uint ii01 = 0; ii01 < 25; ii01++)
-        for (uint jj01 = 0; jj01 < 25; jj01++)
+    for (uint ii01 = 0; ii01 < HORIZONTAL_TO_DRAW; ii01++)
+        for (uint jj01 = 0; jj01 < VERTICAL_TO_DRAW; jj01++)
             {
                 switch (mod)
                     {
@@ -936,8 +936,8 @@ void DMainScreen::RENDER_DRAW_TERRAIN(int mod)
     if (mod == TERRAIN_MOD_NONE)
         {
 
-            for (int ii01=0;ii01<=25;ii01++)
-                for (int jj01=0;jj01<=25;jj01++)
+            for (int ii01=0;ii01<=HORIZONTAL_TO_DRAW;ii01++)
+                for (int jj01=0;jj01<=VERTICAL_TO_DRAW;jj01++)
                     {
                         shader->setUniformValue(shader->uniformLocation("atlasy2"), cells[ii01][jj01].type/4);
                         shader->setUniformValue(shader->uniformLocation("atlasx2"), (cells[ii01][jj01].type%4)*8 + cells[ii01][jj01].variety);
@@ -1046,8 +1046,8 @@ void DMainScreen::RENDER_DRAW_TERRAIN(int mod)
     if (mod == TERRAIN_MOD_NONE)
         {
 
-            for (int ii01=0;ii01<=25;ii01++)
-                for (int jj01=0;jj01<=25;jj01++)
+            for (int ii01=0;ii01<=HORIZONTAL_TO_DRAW;ii01++)
+                for (int jj01=0;jj01<=VERTICAL_TO_DRAW;jj01++)
                     {
                         if (cells[ii01][jj01].type ==TERRAIN_TYPES_WATER)
                             {
@@ -1066,8 +1066,8 @@ void DMainScreen::RENDER_DRAW_TERRAIN(int mod)
     if (mod == TERRAIN_MOD_NONE)
         {
 
-            for (int ii01=0;ii01<=25;ii01++)
-                for (int jj01=0;jj01<=25;jj01++)
+            for (int ii01=0;ii01<=HORIZONTAL_TO_DRAW;ii01++)
+                for (int jj01=0;jj01<=VERTICAL_TO_DRAW;jj01++)
                     {
 
                         int shores = 0;

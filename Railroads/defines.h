@@ -7,7 +7,8 @@
 #define HEIGHT 100
 #define HEIGHT2 50
 #define GAME_ROOT_DIR "C:/YetAnotherTycoon/RailAssets/"
-
+#define HORIZONTAL_TO_DRAW 50
+#define VERTICAL_TO_DRAW 50
 // ======================= GAMEPLAY ==============================
 // TERRAIN TYPES
 
@@ -30,7 +31,7 @@
 
 #define TERRAIN_TYPES_WATER 16
 
-#define HEIGHT_DIFF_THRESHOLD 5
+#define HEIGHT_DIFF_THRESHOLD 12
 // ======================= STATES AND SUBSTATES ================
 
 #define STATE_MAINMENU 0

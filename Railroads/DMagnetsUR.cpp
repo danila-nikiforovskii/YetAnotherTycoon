@@ -106,13 +106,109 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
 
 
 
+    // =========== check connections to split =================
+   //  j0=j0-1;i0=i0+1;
+    if (CornerLimits(i0,j0) && (CornerNodes[i0][j0].dl!=nullptr) && (CornerNodes[i0][j0].dl->type==split_UR_U))
+        {
+            DMagnet * newmagnet = new DMagnet();
+            newmagnet->address.i=i0;
+            newmagnet->address.j=j0;
+            newmagnet->address.type=NetworkNodeTypes::corner;
+            newmagnet->newelement = new class NjunctionUR();
+
+            static_cast<class NjunctionUR*>(newmagnet->newelement)->uru=&(CornerNodes[i0][j0]);
+            static_cast<class NjunctionUR*>(newmagnet->newelement)->urd=&(CornerNodes[i0][j0+1]);
+
+            static_cast<class NjunctionUR*>(newmagnet->newelement)->dlu=&(CornerNodes[i0-2][j0+2]);
+            static_cast<class NjunctionUR*>(newmagnet->newelement)->dld=&(CornerNodes[i0-2][j0+3]);
+
+            static_cast<class NjunctionUR*>(newmagnet->newelement)->i = i0-2;
+            static_cast<class NjunctionUR*>(newmagnet->newelement)->j = j0;
+
+            QList<DNetworkListElement*> allowed;
+            allowed.append(CornerNodes[i0][j0].dl);
+
+            newmagnet->prev = prevptr;
+            newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
+            magnets.append(newmagnet);
+
 
         }
 
 
-    // =========== upgrade straight ur to splits
+    if (CornerLimits(i0,j0) && (CornerNodes[i0][j0].dl!=nullptr) && (CornerNodes[i0][j0].dl->type==split_UR_R))
+        {
+            DMagnet * newmagnet = new DMagnet();
+            newmagnet->address.i=i0;
+            newmagnet->address.j=j0;
+            newmagnet->address.type=NetworkNodeTypes::corner;
+            newmagnet->newelement = new class NjunctionDL();
+
+            static_cast<class NjunctionDL*>(newmagnet->newelement)->urr=&(CornerNodes[i0][j0]);
+            static_cast<class NjunctionDL*>(newmagnet->newelement)->url=&(CornerNodes[i0-1][j0]);
+
+            static_cast<class NjunctionDL*>(newmagnet->newelement)->dlr=&(CornerNodes[i0-2][j0+2]);
+            static_cast<class NjunctionDL*>(newmagnet->newelement)->dll=&(CornerNodes[i0-1][j0+2]);
+
+            static_cast<class NjunctionDL*>(newmagnet->newelement)->i = i0-3;
+            static_cast<class NjunctionDL*>(newmagnet->newelement)->j = j0;
+
+            QList<DNetworkListElement*> allowed;
+            allowed.append(CornerNodes[i0][j0].dl);
+
+            newmagnet->prev = prevptr;
+            newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
+            magnets.append(newmagnet);
+
+
+        }
+
+
+        }
+
+
+    // =========== upgrade straight ur to splits UR_U + FURTHER TO NjunctionUR
     if ( (NNode->ur!=nullptr)&&(NNode->ul==nullptr)&&(NNode->dr==nullptr) && (NNode->ur->type==diagURDL))
         {
+
+
+            if   (  ((CornerNodes[RailStart.i+2][RailStart.j-3].dl)&&(CornerNodes[RailStart.i+2][RailStart.j-3].dl->type==diagURDL))||
+                    ((CornerNodes[RailStart.i+1][RailStart.j-2].dl)&&(CornerNodes[RailStart.i+1][RailStart.j-2].dl->type==diagURDL)))
+                {
+
+                    DMagnet * newmagnet = new DMagnet;
+                    newmagnet->address.i=RailStart.i+2;
+                    newmagnet->address.j=RailStart.j-3;
+                    newmagnet->address.type=NetworkNodeTypes::corner;
+
+                    newmagnet->newelement= new class NjunctionUR();
+
+                    static_cast<class NjunctionUR*>(newmagnet->newelement)->uru=&(CornerNodes[RailStart.i+2][RailStart.j-3]);
+                    static_cast<class NjunctionUR*>(newmagnet->newelement)->urd=&(CornerNodes[RailStart.i+2][RailStart.j-2]);
+                    static_cast<class NjunctionUR*>(newmagnet->newelement)->dlu=&(CornerNodes[RailStart.i][RailStart.j-1]);
+                    static_cast<class NjunctionUR*>(newmagnet->newelement)->dld=NNode;
+                        static_cast<class NjunctionUR*>(newmagnet->newelement)->i = RailStart.i;
+                       static_cast<class NjunctionUR*>(newmagnet->newelement)->j = RailStart.j-3;
+
+                    QList<DNetworkListElement*> allowed;
+                    if((CornerNodes[RailStart.i+1][RailStart.j-1].ur!=nullptr) && (CornerNodes[RailStart.i+1][RailStart.j-1].ur->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i+1][RailStart.j-1].ur);
+                    if((CornerNodes[RailStart.i][RailStart.j].ur!=nullptr) && (CornerNodes[RailStart.i][RailStart.j].ur->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i][RailStart.j].ur);
+
+                    if((CornerNodes[RailStart.i+2][RailStart.j-3].dl!=nullptr) && (CornerNodes[RailStart.i+2][RailStart.j-3].dl->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i+2][RailStart.j-3].dl);
+                    if((CornerNodes[RailStart.i+1][RailStart.j-2].dl!=nullptr) && (CornerNodes[RailStart.i+1][RailStart.j-2].dl->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i+1][RailStart.j-2].dl);
+
+
+
+                    newmagnet->valid=check_obstruction_conditional(newmagnet->newelement,allowed);
+                    magnets.append(newmagnet);
+                }
+            else
+                {
+
             DMagnet * newmagnet = new DMagnet;
             newmagnet->address.i=RailStart.i+2;
             newmagnet->address.j=RailStart.j-3;
@@ -133,11 +229,49 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
 
             newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
             magnets.append(newmagnet);
+                }
         }
 
-    // =========== upgrade straight ur to splits
+    // =========== upgrade straight ur to splits UR_R + further to NjunctionDL
     if ( (NNode->ur!=nullptr)&&(NNode->ul==nullptr)&&(NNode->dr==nullptr) && (NNode->ur->type==diagURDL))
         {
+
+            if   (  ((CornerNodes[RailStart.i+3][RailStart.j-2].dl)&&(CornerNodes[RailStart.i+3][RailStart.j-2].dl->type==diagURDL))||
+                    ((CornerNodes[RailStart.i+2][RailStart.j-1].dl)&&(CornerNodes[RailStart.i+2][RailStart.j-1].dl->type==diagURDL)))
+                {
+
+                    DMagnet * newmagnet = new DMagnet;
+                    newmagnet->address.i=RailStart.i+3;
+                    newmagnet->address.j=RailStart.j-2;
+                    newmagnet->address.type=NetworkNodeTypes::corner;
+
+                    newmagnet->newelement= new class NjunctionDL();
+
+                    static_cast<class NjunctionDL*>(newmagnet->newelement)->url=&(CornerNodes[RailStart.i+2][RailStart.j-2]);
+                    static_cast<class NjunctionDL*>(newmagnet->newelement)->urr=&(CornerNodes[RailStart.i+3][RailStart.j-2]);
+                    static_cast<class NjunctionDL*>(newmagnet->newelement)->dlr=&(CornerNodes[RailStart.i+1][RailStart.j]);
+                    static_cast<class NjunctionDL*>(newmagnet->newelement)->dll=NNode;
+                        static_cast<class NjunctionDL*>(newmagnet->newelement)->i = RailStart.i;
+                       static_cast<class NjunctionDL*>(newmagnet->newelement)->j = RailStart.j-2;
+
+                    QList<DNetworkListElement*> allowed;
+                    if((CornerNodes[RailStart.i+1][RailStart.j-1].ur!=nullptr) && (CornerNodes[RailStart.i+1][RailStart.j-1].ur->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i+1][RailStart.j-1].ur);
+                    if((CornerNodes[RailStart.i][RailStart.j].ur!=nullptr) && (CornerNodes[RailStart.i][RailStart.j].ur->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i][RailStart.j].ur);
+
+                    if((CornerNodes[RailStart.i+3][RailStart.j-2].dl!=nullptr) && (CornerNodes[RailStart.i+3][RailStart.j-2].dl->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i+3][RailStart.j-2].dl);
+                    if((CornerNodes[RailStart.i+2][RailStart.j-1].dl!=nullptr) && (CornerNodes[RailStart.i+2][RailStart.j-1].dl->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i+2][RailStart.j-1].dl);
+
+
+
+                    newmagnet->valid=check_obstruction_conditional(newmagnet->newelement,allowed);
+                    magnets.append(newmagnet);
+                }
+            else
+                {
             DMagnet * newmagnet = new DMagnet;
             newmagnet->address.i=RailStart.i+3;
             newmagnet->address.j=RailStart.j-2;
@@ -158,6 +292,8 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
 
             newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
             magnets.append(newmagnet);
+                }
+
         }
 
 
@@ -449,6 +585,67 @@ newmagnet->valid = check_obstruction(newmagnet->newelement);
                 }
 
     }
+
+
+    // ========= upgrade split DL_D TO NjunctionUR
+
+        if  ( (NNode->ur!=nullptr) && (NNode->ur->type==split_DL_D))
+            {
+
+                DMagnet * newmagnet = new DMagnet;
+                newmagnet->address.i=RailStart.i+2;
+                newmagnet->address.j=RailStart.j-2;
+                newmagnet->address.type=NetworkNodeTypes::corner;
+
+                newmagnet->newelement= new class NjunctionUR();
+
+                static_cast<class NjunctionUR*>(newmagnet->newelement)->dlu=&(CornerNodes[RailStart.i][RailStart.j+1]);
+                static_cast<class NjunctionUR*>(newmagnet->newelement)->dld=NNode;
+                static_cast<class NjunctionUR*>(newmagnet->newelement)->uru=&(CornerNodes[RailStart.i+2][RailStart.j-3]);
+                static_cast<class NjunctionUR*>(newmagnet->newelement)->urd=&(CornerNodes[RailStart.i+2][RailStart.j-2]);
+                    static_cast<class NjunctionUR*>(newmagnet->newelement)->i = RailStart.i;
+                   static_cast<class NjunctionUR*>(newmagnet->newelement)->j = RailStart.j-3;
+
+                QList<DNetworkListElement*> allowed;
+                if((CornerNodes[RailStart.i+2][RailStart.j-2].dl!=nullptr) && (CornerNodes[RailStart.i+2][RailStart.j-2].dl->type==diagURDL))
+                    allowed.append(CornerNodes[RailStart.i+2][RailStart.j-2].dl);
+                allowed.append(NNode->ur);
+                newmagnet->valid=check_obstruction_conditional(newmagnet->newelement,allowed);
+                magnets.append(newmagnet);
+
+            }
+
+
+
+
+        // ========= upgrade split DL_L TO NjunctionDL
+
+            if  ( (NNode->ur!=nullptr) && (NNode->ur->type==split_DL_L))
+                {
+
+                    DMagnet * newmagnet = new DMagnet;
+                    newmagnet->address.i=RailStart.i+2;
+                    newmagnet->address.j=RailStart.j-2;
+                    newmagnet->address.type=NetworkNodeTypes::corner;
+
+                    newmagnet->newelement= new class NjunctionDL();
+
+                    static_cast<class NjunctionDL*>(newmagnet->newelement)->dlr=&(CornerNodes[RailStart.i+1][RailStart.j]);
+                    static_cast<class NjunctionDL*>(newmagnet->newelement)->dll=NNode;
+                    static_cast<class NjunctionDL*>(newmagnet->newelement)->urr=&(CornerNodes[RailStart.i+3][RailStart.j-2]);
+                    static_cast<class NjunctionDL*>(newmagnet->newelement)->url=&(CornerNodes[RailStart.i+2][RailStart.j-2]);
+                        static_cast<class NjunctionDL*>(newmagnet->newelement)->i = RailStart.i;
+                       static_cast<class NjunctionDL*>(newmagnet->newelement)->j = RailStart.j-2;
+
+                    QList<DNetworkListElement*> allowed;
+                    if((CornerNodes[RailStart.i+2][RailStart.j-2].dl!=nullptr) && (CornerNodes[RailStart.i+2][RailStart.j-2].dl->type==diagURDL))
+                        allowed.append(CornerNodes[RailStart.i+2][RailStart.j-2].dl);
+                    allowed.append(NNode->ur);
+                    newmagnet->valid=check_obstruction_conditional(newmagnet->newelement,allowed);
+                    magnets.append(newmagnet);
+
+                }
+
 
 
 }

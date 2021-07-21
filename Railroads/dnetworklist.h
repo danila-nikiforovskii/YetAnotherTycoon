@@ -1165,7 +1165,7 @@ class splitDL_D: public DNetworkListElement
                       AppendFULL(1,0);
                       AppendUR(1,1);AppendFULL(0,1);
                       AppendFULL(0,2);
-                       type = RailTypes::split_DL_L;
+                       type = RailTypes::split_DL_D;
                   }
 
         void LinkNodes(){ ur->dl=this;dl->ur=this;d->ur=this;}
@@ -1197,7 +1197,7 @@ class splitDL_L: public DNetworkListElement
                       AppendFULL(0,1);
                       AppendDR(1,0);AppendFULL(1,01);
                       AppendFULL(2,0);
-                       type = RailTypes::split_DL_D;
+                       type = RailTypes::split_DL_L;
                   }
         void LinkNodes(){ ur->dl=this;dl->ur=this;l->ur=this;}
         void kill(){ ur->dl=nullptr;dl->ur=nullptr;l->ur=nullptr;erase();}
@@ -1327,6 +1327,371 @@ class splitUL_U: public DNetworkListElement
         DCornerNode *dr;
         DCornerNode *u;
 };
+
+
+// ================== N JUNCTIONS ===============
+
+class NjunctionU: public DNetworkListElement
+{
+    public:
+        NjunctionU() {
+               ax = 2;
+               ay = 20;
+               bx = 3;
+               by = 22;
+               rot = d0;
+                AppendFULL(0,0);AppendFULL(1,0);
+                AppendFULL(0,1);AppendFULL(1,1);
+                AppendFULL(0,2);AppendFULL(1,2);
+            type = RailTypes::Njunction_U;
+
+        }
+
+        void LinkNodes(){
+            dl->u = this; dr->u = this;
+            ul->d = this; ur->d = this;
+        }
+
+        void kill(){
+            dl->u = nullptr; dr->u = nullptr;
+            ul->d = nullptr; ur->d = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+
+            if (ul->d!=nullptr) ul->d->kill();
+            if (ur->d!=nullptr) ur->d->kill();
+            if (dr->u!=nullptr) dr->u->kill();
+            if (dl->u!=nullptr) dl->u->kill();
+
+            if (mid_u_l->d!=nullptr) mid_u_l->d->kill();
+            if (mid_u_r->d!=nullptr) mid_u_r->d->kill();
+
+
+        }
+
+        DHorizontalSideNode *dl;
+        DHorizontalSideNode *dr;
+
+        DHorizontalSideNode *ul;
+        DHorizontalSideNode *ur;
+
+        DHorizontalSideNode *mid_u_l;
+        DHorizontalSideNode *mid_u_r;
+
+        DHorizontalSideNode (*array)[0][0];
+};
+
+class NjunctionD: public DNetworkListElement
+{
+    public:
+        NjunctionD() {
+               ax = 2;
+               ay = 20;
+               bx = 3;
+               by = 22;
+               rot = m0;
+                 AppendFULL(0,0);AppendFULL(1,0);
+                AppendFULL(0,1);AppendFULL(1,1);
+                AppendFULL(0,2);AppendFULL(1,2);
+            type = RailTypes::Njunction_D;
+        }
+
+        void LinkNodes(){
+            dl->u = this; dr->u = this;
+            ul->d = this; ur->d = this;
+        }
+
+        void kill(){
+            dl->u = nullptr; dr->u = nullptr;
+            ul->d = nullptr; ur->d = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+
+            if (ul->d!=nullptr) ul->d->kill();
+            if (ur->d!=nullptr) ur->d->kill();
+            if (dr->u!=nullptr) dr->u->kill();
+            if (dl->u!=nullptr) dl->u->kill();
+
+            if (mid_u_l->d!=nullptr) mid_u_l->d->kill();
+            if (mid_u_r->d!=nullptr) mid_u_r->d->kill();
+
+        }
+
+        DHorizontalSideNode *dl;
+        DHorizontalSideNode *dr;
+
+        DHorizontalSideNode *ul;
+        DHorizontalSideNode *ur;
+
+
+        DHorizontalSideNode *mid_u_l;
+        DHorizontalSideNode *mid_u_r;
+
+};
+
+
+class NjunctionR: public DNetworkListElement
+{
+    public:
+        NjunctionR() {
+               ax = 2;
+               ay = 20;
+               bx = 3;
+               by = 22;
+               rot = d90;
+                AppendFULL(0,0);AppendFULL(1,0);AppendFULL(2,0);
+                AppendFULL(0,1);AppendFULL(1,1);AppendFULL(2,1);
+            type = RailTypes::Njunction_R;
+        }
+
+        void LinkNodes(){
+            lu->r = this; ld->r = this;
+            ru->l = this; rd->l = this;
+        }
+
+        void kill(){
+            lu->r = nullptr; ld->r = nullptr;
+            ru->l = nullptr; rd->l = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+            if (lu->r!=nullptr) lu->r->kill();
+            if (ld->r!=nullptr) ld->r->kill();
+            if (ru->l!=nullptr) ru->l->kill();
+            if (rd->l!=nullptr) rd->l->kill();
+
+            if (mid_r_u->l!=nullptr) mid_r_u->l->kill();
+            if (mid_r_d->l!=nullptr) mid_r_d->l->kill();
+        }
+
+        DVerticalSideNode *lu;
+        DVerticalSideNode *ld;
+
+        DVerticalSideNode *ru;
+        DVerticalSideNode *rd;
+
+        DVerticalSideNode *mid_r_u;
+        DVerticalSideNode *mid_r_d;
+};
+
+class NjunctionL: public DNetworkListElement
+{
+    public:
+        NjunctionL() {
+               ax = 2;
+               ay = 20;
+               bx = 3;
+               by = 22;
+               rot = m90;
+                AppendFULL(0,0);AppendFULL(1,0);AppendFULL(2,0);
+                AppendFULL(0,1);AppendFULL(1,1);AppendFULL(2,1);
+            type = RailTypes::Njunction_R;
+        }
+
+        void LinkNodes(){
+            lu->r = this; ld->r = this;
+            ru->l = this; rd->l = this;
+        }
+
+        void kill(){
+            lu->r = nullptr; ld->r = nullptr;
+            ru->l = nullptr; rd->l = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+            if (lu->r!=nullptr) lu->r->kill();
+            if (ld->r!=nullptr) ld->r->kill();
+            if (ru->l!=nullptr) ru->l->kill();
+            if (rd->l!=nullptr) rd->l->kill();
+
+            if (mid_r_u->l!=nullptr) mid_r_u->l->kill();
+            if (mid_r_d->l!=nullptr) mid_r_d->l->kill();
+        }
+
+        DVerticalSideNode *lu;
+        DVerticalSideNode *ld;
+
+        DVerticalSideNode *ru;
+        DVerticalSideNode *rd;
+
+        DVerticalSideNode *mid_r_u;
+        DVerticalSideNode *mid_r_d;
+};
+
+
+class NjunctionUR: public DNetworkListElement
+{
+    public:
+        NjunctionUR() {
+               ax = 4;
+               ay = 20;
+               bx = 5;
+               by = 22;
+               rot = d0;
+                                AppendFULL(1,0);
+                AppendFULL(0,1);AppendFULL(1,1);
+                AppendFULL(0,2);
+            type = RailTypes::Njunction_UR;
+        }
+
+        void LinkNodes(){
+            dlu->ur = this; uru->dl = this;
+            dld->ur = this; urd->dl = this;
+        }
+
+        void kill(){
+            dlu->ur = nullptr; uru->dl = nullptr;
+            dld->ur = nullptr; urd->dl = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+            if (dlu->ur!=nullptr) dlu->ur->kill();
+            if (dld->ur!=nullptr) dld->ur->kill();
+            if (uru->dl!=nullptr) uru->dl->kill();
+            if (urd->dl!=nullptr) urd->dl->kill();
+        }
+
+        DCornerNode *dlu;
+        DCornerNode *dld;
+
+        DCornerNode *uru;
+        DCornerNode *urd;
+
+};
+
+
+class NjunctionDR: public DNetworkListElement
+{
+    public:
+        NjunctionDR() {
+               ax = 4;
+               ay = 20;
+               bx = 5;
+               by = 22;
+               rot = d90;
+                AppendFULL(0,0);AppendFULL(1,0);
+                                AppendFULL(1,1);AppendFULL(2,1);
+
+            type = RailTypes::Njunction_DR;
+        }
+
+        void LinkNodes(){
+            ull->dr = this; drl->ul = this;
+            ulr->dr = this; drr->ul = this;
+        }
+
+        void kill(){
+            ull->dr = nullptr; drl->ul = nullptr;
+            ulr->dr = nullptr; drr->ul = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+            if (ull->dr!=nullptr) ull->dr->kill();
+            if (ulr->dr!=nullptr) ulr->dr->kill();
+            if (drl->ul!=nullptr) drl->ul->kill();
+            if (drr->ul!=nullptr) drr->ul->kill();
+        }
+
+        DCornerNode *ull;
+        DCornerNode *ulr;
+
+        DCornerNode *drl;
+        DCornerNode *drr;
+
+};
+
+
+class NjunctionUL: public DNetworkListElement
+{
+    public:
+        NjunctionUL() {
+               ax = 4;
+               ay = 20;
+               bx = 5;
+               by = 22;
+               rot = m0;
+                AppendFULL(0,0);
+                AppendFULL(0,1);AppendFULL(1,1);
+                                AppendFULL(1,2);
+
+            type = RailTypes::Njunction_UL;
+        }
+
+        void LinkNodes(){
+            ulu->dr = this; dru->ul = this;
+            ulu->dr = this; drd->ul = this;
+        }
+
+        void kill(){
+            ulu->dr = nullptr; dru->ul = nullptr;
+            uld->dr = nullptr; drd->ul = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+            if (ulu->dr!=nullptr) ulu->dr->kill();
+            if (uld->dr!=nullptr) uld->dr->kill();
+            if (drd->ul!=nullptr) drd->ul->kill();
+            if (dru->ul!=nullptr) dru->ul->kill();
+        }
+
+        DCornerNode *ulu;
+        DCornerNode *uld;
+
+        DCornerNode *dru;
+        DCornerNode *drd;
+
+};
+
+class NjunctionDL: public DNetworkListElement
+{
+    public:
+        NjunctionDL() {
+               ax = 4;
+               ay = 20;
+               bx = 5;
+               by = 22;
+               rot = m90;
+                AppendFULL(1,0);AppendFULL(2,0);
+                AppendFULL(0,1);AppendFULL(1,1);
+
+
+            type = RailTypes::Njunction_DL;
+        }
+
+        void LinkNodes(){
+            dll->ur = this; url->dl = this;
+            dlr->ur = this; urr->dl = this;
+        }
+
+        void kill(){
+            dll->ur = nullptr; url->dl = nullptr;
+            dlr->ur = nullptr; urr->dl = nullptr;
+            erase();
+        }
+
+        void killUpgraded(){
+            if (dll->ur!=nullptr) dll->ur->kill();
+            if (dlr->ur!=nullptr) dlr->ur->kill();
+            if (url->dl!=nullptr) url->dl->kill();
+            if (urr->dl!=nullptr) urr->dl->kill();
+        }
+
+        DCornerNode *dll;
+        DCornerNode *dlr;
+
+        DCornerNode *url;
+        DCornerNode *urr;
+};
+
 
 
 // ====================== END =====================

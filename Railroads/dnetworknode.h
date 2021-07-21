@@ -93,7 +93,6 @@ class DHorizontalSideNode : public DNetworkNode
 
     DNetworkListElement * u = nullptr;
     DNetworkListElement * d = nullptr;
-
 };
 
 class DVerticalSideNode : public DNetworkNode
@@ -110,6 +109,7 @@ class DVerticalSideNode : public DNetworkNode
 
 };
 
+
 class DCornerNode: public DNetworkNode
 {
     public:
@@ -122,12 +122,11 @@ class DCornerNode: public DNetworkNode
 
    int getNodeID();
 
+
    DNetworkListElement *ul = nullptr;
    DNetworkListElement *ur = nullptr;
    DNetworkListElement *dl  = nullptr;
    DNetworkListElement *dr = nullptr;
-
-
 };
 
 #endif // DNETWORKNODE_H
