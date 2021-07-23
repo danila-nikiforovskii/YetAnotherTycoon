@@ -503,12 +503,12 @@ if (NNode->l==nullptr)
 
 
 
-        if ( ((CornerNodes[RailStart.i-3][RailStart.j+2].ur!=nullptr)&&(CornerNodes[RailStart.i-3][RailStart.j+2].ur->type==diagURDL)) ||
+       if ( ((CornerNodes[RailStart.i-3][RailStart.j+2].ur!=nullptr)&&(CornerNodes[RailStart.i-3][RailStart.j+2].ur->type==diagURDL)) ||
              ((CornerNodes[RailStart.i-2][RailStart.j+1].ur!=nullptr)&&(CornerNodes[RailStart.i-2][RailStart.j+1].ur->type==diagURDL))
              )
             {
 
-                if ( (CornerNodes[RailStart.i-1][RailStart.j+1].dl!=nullptr)&&(CornerNodes[RailStart.i-1][RailStart.j+1].dl->type==junction_UR_R))
+               /* if ( (CornerNodes[RailStart.i-1][RailStart.j+1].dl!=nullptr)&&(CornerNodes[RailStart.i-1][RailStart.j+1].dl->type==junction_UR_R))
                     {
 
 
@@ -552,7 +552,7 @@ if (NNode->l==nullptr)
                     {
 
 
-
+                        */
 
                         DMagnet * newmagnet = new DMagnet;
                         newmagnet->address.i=RailStart.i-3;
@@ -578,7 +578,7 @@ if (NNode->l==nullptr)
                         newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
                         magnets.append(newmagnet);
 
-                    }
+//                    }
             }
         else {
 

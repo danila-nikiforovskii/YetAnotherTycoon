@@ -226,7 +226,7 @@ if ( (NNode->dr!=nullptr)&&(NNode->ur==nullptr)&&(NNode->dl==nullptr)&&(NNode->d
                 newmagnet->newelement = new class NjunctionDR();
 
                 static_cast<class NjunctionDR*>(newmagnet->newelement)->ull=&(CornerNodes[RailStart.i][RailStart.j]);
-                static_cast<class NjunctionDR*>(newmagnet->newelement)->ulr=&(CornerNodes[RailStart.i][RailStart.j+1]);
+                static_cast<class NjunctionDR*>(newmagnet->newelement)->ulr=&(CornerNodes[RailStart.i+1][RailStart.j]);
                 static_cast<class NjunctionDR*>(newmagnet->newelement)->drl=&(CornerNodes[RailStart.i+2][RailStart.j+2]);
                 static_cast<class NjunctionDR*>(newmagnet->newelement)->drr=&(CornerNodes[RailStart.i+3][RailStart.j+2]);
 
@@ -460,7 +460,7 @@ if ( (NNode->dr==nullptr)&&(NNode->ur==nullptr)&&(NNode->dl==nullptr) )
     {
        // CHECK FOR JUNCTION ASIDE AND PROMOTOTE TO DOUBLE TRACK
 
-        if ( (CornerNodes[RailStart.i-1][RailStart.j].dr!=nullptr)&&(CornerNodes[RailStart.i-1][RailStart.j].dr->type==junction_U_UL))
+       /* if ( (CornerNodes[RailStart.i-1][RailStart.j].dr!=nullptr)&&(CornerNodes[RailStart.i-1][RailStart.j].dr->type==junction_U_UL))
             {
                 DMagnet * newmagnet = new DMagnet;
                                 newmagnet->address.i=RailStart.i+1;
@@ -504,7 +504,7 @@ if ( (NNode->dr==nullptr)&&(NNode->ur==nullptr)&&(NNode->dl==nullptr) )
             }
         else
             {
-
+        */
         // upgraded to junction
       if  (  ((HorizontalSideNodes[RailStart.i+1][RailStart.j+2].d!=nullptr) && (HorizontalSideNodes[RailStart.i+1][RailStart.j+2].d->type==straightVert))||
              ((HorizontalSideNodes[RailStart.i+1][RailStart.j+2].u!=nullptr) && (HorizontalSideNodes[RailStart.i+1][RailStart.j+2].u->type==straightVert)))
@@ -546,7 +546,7 @@ if ( (NNode->dr==nullptr)&&(NNode->ur==nullptr)&&(NNode->dl==nullptr) )
         newmagnet->valid = check_obstruction(newmagnet->newelement);
         magnets.append(newmagnet);
         }
-            }
+          //  }
 
 }
 

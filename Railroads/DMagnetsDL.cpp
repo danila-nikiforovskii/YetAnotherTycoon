@@ -426,6 +426,7 @@ void DMainScreen::PREPARE_MAGNETS_DL()
 
             // check for junction aside...
 
+            /*
              if ((CornerNodes[RailStart.i+1][RailStart.j].dl!=nullptr)&&(CornerNodes[RailStart.i+1][RailStart.j].dl->type==junction_U_UR))
                  {
 
@@ -474,7 +475,7 @@ void DMainScreen::PREPARE_MAGNETS_DL()
                  }
              else
                  {
-
+            */
 
            if ( ((HorizontalSideNodes[RailStart.i-2][RailStart.j+2].d!=nullptr) && (HorizontalSideNodes[RailStart.i-2][RailStart.j+2].d->type==straightVert))||
                ((HorizontalSideNodes[RailStart.i-2][RailStart.j+2].u!=nullptr) && (HorizontalSideNodes[RailStart.i-2][RailStart.j+2].u->type==straightVert)))
@@ -517,7 +518,8 @@ void DMainScreen::PREPARE_MAGNETS_DL()
             static_cast<class tight_DL_D*>(newmagnet->newelement)->j = RailStart.j;
 newmagnet->valid = check_obstruction(newmagnet->newelement);
             magnets.append(newmagnet);
-               }}
+               }
+        //}
         }
 
 

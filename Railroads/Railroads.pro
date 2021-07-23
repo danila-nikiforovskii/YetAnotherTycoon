@@ -17,6 +17,7 @@ SOURCES += \
     DMagnetsU.cpp \
     DMagnetsUL.cpp \
     DMagnetsUR.cpp \
+    DRandom.cpp \
     dloco.cpp \
     dmagnets.cpp \
     dmainscreen.cpp \

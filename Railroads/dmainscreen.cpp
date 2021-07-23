@@ -11,7 +11,7 @@ DMainScreen::DMainScreen(QWidget *parent): QGLWidget(QGLFormat(QGL::SampleBuffer
 {
     Q_UNUSED(parent);
     waterframe = 0;
-    seed = QDateTime::currentMSecsSinceEpoch()%ULONG_MAX;
+    Randomize();
     cursor_x = -1; cursor_y = -1;
     setMouseTracking(true);
     setFocusPolicy(Qt::ClickFocus);
@@ -270,17 +270,6 @@ void DMainScreen::timerEvent(QTimerEvent *event)
 
 }
 
-unsigned long long DMainScreen::DRandom()
-{
-    seed = (seed*25214903917 + 11)%281474976710656;
-    return seed;
-}
-
-float DMainScreen::DFloatRandom()
-{
-    seed = (seed*25214903917 + 11)%281474976710656;;
-    return seed*1.0f/static_cast<float>(281474976710656);
-}
 
 void DMainScreen::draw()
 {
@@ -511,7 +500,7 @@ void DMainScreen::resizeGL(int width, int height)
             delete fbo;
 
             glActiveTexture(GL_TEXTURE6);
-            fbo = new QOpenGLFramebufferObject(QSize(viewport_width,viewport_height));
+            fbo = new QOpenGLFramebufferObject(QSize(this->width(),this->height()));
             //fbo = new QOpenGLFramebufferObject(QSize(this->width(),this->height()));
             glBindTexture(GL_TEXTURE_2D, fbo->texture());
         }
@@ -1853,8 +1842,8 @@ void DMainScreen::paintGL()
     glLoadIdentity();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0,this->viewport_width,this->viewport_height,0.0,-1.0,1.0);
-    //glOrtho(0.0,width(),height(),0,-1.0,1.0);
+    //glOrtho(0.0,this->viewport_width,this->viewport_height,0.0,-1.0,1.0);
+    glOrtho(0.0,width(),height(),0,-1.0,1.0);
 
     shader->bind();
     shader->setUniformValue(shader->uniformLocation("mousemap"), 1 );
@@ -1914,7 +1903,8 @@ void DMainScreen::paintGL()
     // ======================================  MAIN DRAWING INTO FRAME BUFFER OBJECT =====================
 
     fbo->bind();
-    glViewport(0,0, viewport_width, viewport_height);
+ //   glViewport(0,0, viewport_width, viewport_height);
+       glViewport(0,0, width(), height());
     //glClearColor(qtBG.redF(),qtBG.greenF(),qtBG.blueF(),1.0);
     glClearColor(0.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -1923,8 +1913,8 @@ void DMainScreen::paintGL()
     glLoadIdentity();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // glOrtho(0.0f,width(), height(),0.0f,-1.0f,1.0f);
-    glOrtho(0.0,this->viewport_width,this->viewport_height,0.0,-1.0,1.0);
+     glOrtho(0.0f,width(), height(),0.0f,-1.0f,1.0f);
+  //  glOrtho(0.0,this->viewport_width,this->viewport_height,0.0,-1.0,1.0);
     shader->bind();
     shader->setUniformValue(shader->uniformLocation("mousemap"), 0);
     shader->setUniformValue(shader->uniformLocation("noshade"), 0);
@@ -2462,6 +2452,7 @@ void DMainScreen::RENDER_NETWORK()//QList<DRailFragment> *network)
               //let's draw in corners of diag elements.
              // we will draw the adjanced to the LOWER port of the element.
 
+
             DCornerNode * port = nullptr;
             shader->setUniformValue(shader->uniformLocation("atlasx"),1);
             shader->setUniformValue(shader->uniformLocation("atlasy"),13);
@@ -2566,6 +2557,515 @@ void DMainScreen::RENDER_NETWORK()//QList<DRailFragment> *network)
                            }
                        break;
                        }
+
+              // ================== JUNCTIONS
+                  case RailTypes::junction_D_DR:
+                         {
+                          port = static_cast<class junctionD_DR*>(iter)->dr;
+                          if ((port!=nullptr)&&(port->dr!=nullptr)&&(port->ul!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                   RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                break;
+                }
+
+
+                  case RailTypes::junction_D_DL:
+                      {
+                          port = static_cast<class junctionD_DL*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+
+                  case RailTypes::junction_R_DR:
+                         {
+                          port = static_cast<class junctionR_DR*>(iter)->dr;
+                          if ((port!=nullptr)&&(port->dr!=nullptr)&&(port->ul!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                   RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                break;
+                }
+
+
+                  case RailTypes::junction_L_DL:
+                      {
+                          port = static_cast<class junctionL_DL*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+
+                  case RailTypes::junction_UL_L:
+                      {
+                          port = static_cast<class junctionUL_L*>(iter)->dr;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                          break;
+                      }
+
+
+
+                  case RailTypes::junction_UL_U:
+                      {
+                          port = static_cast<class junctionUL_U*>(iter)->dr;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                          break;
+                      }
+
+
+                  case RailTypes::junction_UR_U:
+                      {
+                          port = static_cast<class junctionUR_U*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+                  case RailTypes::junction_UR_R:
+                      {
+                          port = static_cast<class junctionUR_U*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+
+
+                  case RailTypes::junction_DR_D:
+                      {
+                          port = static_cast<class junctionDR_D*>(iter)->dr;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                          break;
+                      }
+
+                  case RailTypes::junction_DR_R:
+                      {
+                          port = static_cast<class junctionDR_R*>(iter)->dr;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                          break;
+                      }
+
+
+                  case RailTypes::junction_DL_D:
+                      {
+                          port = static_cast<class junctionDL_D*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+
+                  case RailTypes::junction_DL_L:
+                      {
+                          port = static_cast<class junctionDL_D*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+
+                      // =================== splits ===================
+                  case RailTypes::split_UR_U:
+                      {
+                          port = static_cast<class splitUR_U*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+                  case RailTypes::split_UR_R:
+                      {
+                          port = static_cast<class splitUR_R*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+
+                  case RailTypes::split_DR_R:
+                      {
+                          port = static_cast<class splitDR_R*>(iter)->dr;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+
+                          port = static_cast<class splitDR_R*>(iter)->r;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                          break;
+                      }
+
+                  case RailTypes::split_DR_D:
+                      {
+                          port = static_cast<class splitDR_D*>(iter)->dr;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+
+                          port = static_cast<class splitDR_D*>(iter)->d;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                          break;
+                      }
+
+                  case RailTypes::split_DL_L:
+                      {
+                          port = static_cast<class splitDL_L*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+
+                          port = static_cast<class splitDL_L*>(iter)->l;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+                  case RailTypes::split_DL_D:
+                      {
+                          port = static_cast<class splitDL_D*>(iter)->dl;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+
+                          port = static_cast<class splitDL_D*>(iter)->d;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+
+
+                  case RailTypes::split_UL_L:
+                      {
+                          port = static_cast<class splitUL_L*>(iter)->dr;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                           break;
+
+                      }
+
+                  case RailTypes::split_UL_U:
+                      {
+                          port = static_cast<class splitUL_U*>(iter)->dr;
+
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                        break;
+                      }
+
+                      //=============== NJUNCTIONS========================
+                  case RailTypes:: Njunction_DR:
+                      {
+                          port = static_cast<class NjunctionDR*>(iter)->drr;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+
+
+                          port = static_cast<class NjunctionDR*>(iter)->drl;
+                          if ((port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                           break;
+                      }
+
+
+                  case RailTypes:: Njunction_UL:
+                      {
+                          port = static_cast<class NjunctionUL*>(iter)->dru;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+
+
+                          port = static_cast<class NjunctionUL*>(iter)->drd;
+                          if ((port!=nullptr)&&(port->ul!=nullptr)&&(port->dr!=nullptr))
+                              {
+                                  int x = port->tileUR().x();
+                                  int y = port->tileUR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d270);
+
+                                  x = port->tileDL().x();
+                                  y = port->tileDL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d90);
+                              }
+                          break;
+                      }
+
+
+
+                  case RailTypes::Njunction_UR:
+                      {
+                          port = static_cast<class NjunctionUR*>(iter)->dlu;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+
+                          port = static_cast<class NjunctionUR*>(iter)->dld;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+
+
+                  case RailTypes::Njunction_DL:
+                      {
+                          port = static_cast<class NjunctionDL*>(iter)->dll;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+
+                          port = static_cast<class NjunctionDL*>(iter)->dlr;
+                          if ((port!=nullptr)&&(port->dl!=nullptr)&&(port->ur!=nullptr))
+                              {
+                                  int x = port->tileDR().x();
+                                  int y = port->tileDR().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d0);
+
+                                  x = port->tileUL().x();
+                                  y = port->tileUL().y();
+                                  RENDER_BASIC_terrainquad(x,y,map[x][y],map[x+1][y],map[x][y+1],map[x+1][y+1],d180);
+                              }
+                          break;
+                      }
+
+
                         default://do nothing
                                 break;
                   }
@@ -3682,6 +4182,14 @@ void DMainScreen::keyPressEvent(QKeyEvent *event)
 
         case Qt::Key_8:
             CurrentTool = TOOL_BULLDOSE;
+            break;
+
+        case Qt::Key_A:
+           w = w*2;
+            break;
+
+        case Qt::Key_Z:
+           w = w/2;
             break;
         default:
             break;

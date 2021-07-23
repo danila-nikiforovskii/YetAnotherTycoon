@@ -99,10 +99,18 @@ public:
     DNetworkList * NetworkList;
 
     vec3 normals[WIDTH+1][HEIGHT+1];
+
+    uint LFSR[32];
+    uint CAR_ARBITER[32];
+    uint CAR_1[32];
+    uint CAR_2[32];
     unsigned long long int seed;
     unsigned long long DRandom();
+    void Randomize();
     float DFloatRandom();
     int maintimer;
+
+
     int waterframe;
 
 
@@ -118,7 +126,7 @@ public:
     int mx,my;
 
 
-    int w = 80;
+    int w = 66;
     int sx,sy = 0;
     int edge = 0;
 
@@ -132,6 +140,8 @@ public:
     int CurrentTool = 3;
     bool show_edge = false;
     bool OpenGL_INIT = false;
+
+
 
 
    // QList<DRailFragment> network;

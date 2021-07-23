@@ -332,7 +332,7 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
     if ( (NNode->ur!=nullptr)&&(NNode->ul==nullptr)&&(NNode->dr==nullptr) && (NNode->ur->type==diagURDL))
         {
 
-            if ( (CornerNodes[RailStart.i][RailStart.j+1].ur!=nullptr)&&(CornerNodes[RailStart.i][RailStart.j+1].ur->type==junction_UR_R))
+            /*if ( (CornerNodes[RailStart.i][RailStart.j+1].ur!=nullptr)&&(CornerNodes[RailStart.i][RailStart.j+1].ur->type==junction_UR_R))
                 {
 
                     DMagnet * newmagnet = new DMagnet;
@@ -369,7 +369,7 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
 
                 }
             else
-            {
+            {*/
             DMagnet * newmagnet = new DMagnet;
             newmagnet->address.i=RailStart.i+3;
             newmagnet->address.j=RailStart.j-2;
@@ -391,7 +391,7 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
             newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
             magnets.append(newmagnet);
 
-            }
+           // }
         }
 
 
@@ -433,7 +433,7 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
         {
 
 
-            if ( (CornerNodes[RailStart.i][RailStart.j-1].ur!=nullptr)&&(CornerNodes[RailStart.i][RailStart.j-1].ur->type==junction_UR_R))
+           /* if ( (CornerNodes[RailStart.i][RailStart.j-1].ur!=nullptr)&&(CornerNodes[RailStart.i][RailStart.j-1].ur->type==junction_UR_R))
                 {
 
 
@@ -468,7 +468,7 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
                 }
 
             else
-                {
+                {*/
                     DMagnet * newmagnet = new DMagnet;
                     newmagnet->address.i=RailStart.i+2;
                     newmagnet->address.j=RailStart.j-2;
@@ -490,7 +490,7 @@ DCornerNode * NNode = &(CornerNodes[RailStart.i][RailStart.j]);
                     newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
                     magnets.append(newmagnet);
 
-                }
+          //      }
         }
 
 

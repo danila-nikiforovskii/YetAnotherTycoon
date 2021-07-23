@@ -549,7 +549,7 @@ class junctionR_UR: public DNetworkListElement
             bx = 4;
             by = 15;
             rot = d0;
-            AppendFULL(0,1);AppendFULL(1,1);AppendDR(0,1);AppendFULL(0,2);
+           AppendFULL(0,1);AppendFULL(1,1);AppendDR(1,0);AppendFULL(2,0);
           type = RailTypes::junction_R_UR;
         }
         void LinkNodes(){ l->r=this;r->l=this;ur->dl=this;}
@@ -575,7 +575,7 @@ class junctionR_DR: public DNetworkListElement
                     bx = 4;
                     by = 15;
                     rot = m180;
-                    AppendFULL(0,0);AppendFULL(1,0);AppendUR(0,1);AppendFULL(2,1);
+                    AppendFULL(0,0);AppendFULL(1,0);AppendUR(1,1);AppendFULL(2,1);
                   type = RailTypes::junction_R_DR;
                 }
                 void LinkNodes(){ l->r=this;r->l=this;dr->ul=this;}
@@ -707,7 +707,7 @@ public:
                            by = 17;
                            rot = d270;
                            AppendFULL(1,0);AppendFULL(0,1);AppendUL(1,1);AppendFULL(0,2);
-                         type = RailTypes::junction_DR_D;
+                         type = RailTypes::junction_DL_D;
                        }
                        void LinkNodes(){ ur->dl=this;dl->ur=this;d->u=this;}
                        void kill(){ ur->dl=nullptr;dl->ur=nullptr;d->u=nullptr;erase();}
@@ -1047,8 +1047,8 @@ class splitDR_R: public DNetworkListElement
                       bx = 1;
                       by = 19;
                       rot = d90;
-                      AppendFULL(0,0);AppendFULL(1,0);
-                      AppendDL(2,0);AppendFULL(1,1);
+                      AppendFULL(0,0);AppendDL(1,0);
+                      AppendFULL(1,1);
                       AppendFULL(2,1);
                        type = RailTypes::split_DR_R;
                   }
@@ -1076,8 +1076,8 @@ class splitDR_D: public DNetworkListElement
                       bx = 1;
                       by = 19;
                       rot = m180;
-                      AppendFULL(0,0);AppendFULL(0,1);
-                      AppendUR(0,2);AppendFULL(1,1);
+                      AppendFULL(0,0);
+                      AppendUR(0,1);AppendFULL(1,1);
                       AppendFULL(1,2);
                        type = RailTypes::split_DR_D;
                   }
@@ -1169,7 +1169,7 @@ class splitDL_D: public DNetworkListElement
                       by = 19;
                       rot = d180;
                       AppendFULL(1,0);
-                      AppendUR(1,1);AppendFULL(0,1);
+                      AppendUL(1,1);AppendFULL(0,1);
                       AppendFULL(0,2);
                        type = RailTypes::split_DL_D;
                   }
@@ -1201,7 +1201,7 @@ class splitDL_L: public DNetworkListElement
                       by = 19;
                       rot = m270;
                       AppendFULL(0,1);
-                      AppendDR(1,0);AppendFULL(1,01);
+                      AppendDR(1,0);AppendFULL(1,1);
                       AppendFULL(2,0);
                        type = RailTypes::split_DL_L;
                   }
@@ -1286,8 +1286,8 @@ class splitUL_L: public DNetworkListElement
                       by = 19;
                       rot = d270;
                       AppendFULL(0,0);AppendFULL(1,0);
-                      AppendUR(0,1);AppendFULL(1,1);
-                      AppendFULL(2,1);
+                      AppendUR(1,1);AppendFULL(2,1);
+
                        type = RailTypes::split_UL_L;
                   }
 
@@ -1314,8 +1314,8 @@ class splitUL_U: public DNetworkListElement
                       bx = 1;
                       by = 19;
                       rot = m0;
-                      AppendFULL(0,0);AppendDL(1,0);
-                      AppendFULL(0,1);AppendFULL(1,1);
+                      AppendFULL(0,0);AppendDL(1,1);
+                      AppendFULL(0,1);
                       AppendFULL(1,2);
                        type = RailTypes::split_UL_U;
                   }
@@ -1327,7 +1327,7 @@ class splitUL_U: public DNetworkListElement
 
             if (ul->dr!=nullptr) ul->dr->kill();
             if (dr->ul!=nullptr) dr->ul->kill();
-            if (u->ul!=nullptr) u->dr->kill();
+            if (u->dr!=nullptr) u->dr->kill();
         }
         DCornerNode *ul;
         DCornerNode *dr;
@@ -1633,7 +1633,7 @@ class NjunctionUL: public DNetworkListElement
 
         void LinkNodes(){
             ulu->dr = this; dru->ul = this;
-            ulu->dr = this; drd->ul = this;
+            uld->dr = this; drd->ul = this;
         }
 
         void kill(){
@@ -1698,6 +1698,7 @@ class NjunctionDL: public DNetworkListElement
         DCornerNode *urr;
 };
 
+/*
 // double junctions U UL
 class TwoTrackJunctionU_UL: public DNetworkListElement
 {
@@ -1873,7 +1874,7 @@ class TwoTrackJunctionUR_R: public DNetworkListElement
         DVerticalSideNode *ru;
         DVerticalSideNode *rd;
 };
-
+*/
 
 // ====================== END =====================
 

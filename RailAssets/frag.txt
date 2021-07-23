@@ -100,7 +100,7 @@ void main()
 						temp = temp*(ambient+(1.0-ambient)*shade); 
 					
 						if ( (tx< (1.0/32.0)) || (tx > (31.0/32.0)) ||(ty< (1.0/32.0)) || (ty > (31.0/32.0)))
-							gl_FragColor = vec4(temp.xyz*0.80,1.0);
+							gl_FragColor = vec4(temp.xyz*0.99,1.0);
 						else
 							gl_FragColor = vec4(temp.xyz,1.0);
 						}

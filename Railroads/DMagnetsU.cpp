@@ -387,7 +387,8 @@ void DMainScreen::PREPARE_MAGNETS_U()
               // CHECK IF THERE IS A JUNCTION ASIDE AND IF IT IS, UPGRADE TO DOUBLE TRACK JUNCTION
 
 
-              if ((HorizontalSideNodes[RailStart.i-1][RailStart.j].u!=nullptr)&&(HorizontalSideNodes[RailStart.i-1][RailStart.j].u->type==junction_U_UL))
+
+              /*if ((HorizontalSideNodes[RailStart.i-1][RailStart.j].u!=nullptr)&&(HorizontalSideNodes[RailStart.i-1][RailStart.j].u->type==junction_U_UL))
                   {
 
                       DMagnet * newmagnet = new DMagnet;
@@ -429,11 +430,12 @@ void DMainScreen::PREPARE_MAGNETS_U()
                       magnets.append(newmagnet);
 
 
-                  }
+
+
               else
               {
 
-
+  }*/
 
               DMagnet * newmagnet = new DMagnet;
               newmagnet->address.i=RailStart.i-1;
@@ -456,7 +458,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
               newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
 
               magnets.append(newmagnet);
-              }
+             // }
           }
 
       // junction U_UR
@@ -466,7 +468,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
               // CHECK IF THERE IS A JUNCTION ASIDE AND IF IT IS, UPGRADE TO DOUBLE TRACK JUNCTION
 
 
-              if ((HorizontalSideNodes[RailStart.i+1][RailStart.j].u!=nullptr)&&(HorizontalSideNodes[RailStart.i+1][RailStart.j].u->type==junction_U_UR))
+             /* if ((HorizontalSideNodes[RailStart.i+1][RailStart.j].u!=nullptr)&&(HorizontalSideNodes[RailStart.i+1][RailStart.j].u->type==junction_U_UR))
                   {
 
                       DMagnet * newmagnet = new DMagnet;
@@ -511,7 +513,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
                   }
               else
               {
-
+                */
 
               DMagnet * newmagnet = new DMagnet;
               newmagnet->address.i=RailStart.i+2;
@@ -534,7 +536,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
               newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
 
               magnets.append(newmagnet);
-                  }
+                 // }
           }
 
 
@@ -710,7 +712,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
           {
 
 
-              if ((HorizontalSideNodes[RailStart.i+1][RailStart.j].u!=nullptr)&&(HorizontalSideNodes[RailStart.i+1][RailStart.j].u->type==junction_U_UL))
+            /*  if ((HorizontalSideNodes[RailStart.i+1][RailStart.j].u!=nullptr)&&(HorizontalSideNodes[RailStart.i+1][RailStart.j].u->type==junction_U_UL))
                   {
 
                       DMagnet * newmagnet = new DMagnet;
@@ -753,7 +755,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
 
               }
               else
-                  {
+                  {*/
               DMagnet * newmagnet = new DMagnet;
               newmagnet->address.i=RailStart.i;
               newmagnet->address.j=RailStart.j-2;
@@ -775,7 +777,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
               newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
 
               magnets.append(newmagnet);
-                  }
+                 // }
           }
 
       // ==== UP - UPGRADE  tight U UR TO JUNCTION =============
@@ -786,7 +788,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
 
               // check for junction aside...
 
-               if ((HorizontalSideNodes[RailStart.i-1][RailStart.j].u!=nullptr)&&(HorizontalSideNodes[RailStart.i-1][RailStart.j].u->type==junction_U_UR))
+              /* if ((HorizontalSideNodes[RailStart.i-1][RailStart.j].u!=nullptr)&&(HorizontalSideNodes[RailStart.i-1][RailStart.j].u->type==junction_U_UR))
                    {
 
                DMagnet * newmagnet = new DMagnet;
@@ -833,7 +835,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
                magnets.append(newmagnet);
               }
                else
-               {
+               { */
               DMagnet * newmagnet = new DMagnet;
               newmagnet->address.i=RailStart.i;
               newmagnet->address.j=RailStart.j-2;
@@ -855,7 +857,7 @@ void DMainScreen::PREPARE_MAGNETS_U()
               newmagnet->valid = check_obstruction_conditional(newmagnet->newelement,allowed);
 
               magnets.append(newmagnet);
-               }
+              // }
           }
 
 
