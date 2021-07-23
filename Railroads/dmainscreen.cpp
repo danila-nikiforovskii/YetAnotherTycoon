@@ -1958,7 +1958,7 @@ void DMainScreen::paintGL()
     // RENDER_BASIC_multiquad(2,2,2,12,4,13,m270);
     RENDER_NETWORK();//&network);
 
-    // RENDER_BASIC_multiquad(10,10,5,12,13,15);
+     RENDER_BASIC_multiquad(17,10,17,24,24,31,d0);
 
     RENDER_DRAW_UI(UI_MOD_NONE);
 
