@@ -31,7 +31,7 @@
 
 #define TERRAIN_TYPES_WATER 16
 
-#define HEIGHT_DIFF_THRESHOLD 12
+#define HEIGHT_DIFF_THRESHOLD 4
 // ======================= STATES AND SUBSTATES ================
 
 #define STATE_MAINMENU 0
@@ -45,10 +45,13 @@
 #define TOOL_RAILROAD_PLACE_START 30
 #define TOOL_RAILROAD_PLACE_END 31
 
+#define TOOL_ROAD_PLACE_START 60
+#define TOOL_ROAD_PLACE_END 61
+
 #define TOOL_CHANGE_TERRAIN 40
 #define TOOL_TOGGLE_WATER 50
 
-#define TOOL_BULLDOSE 60
+#define TOOL_BULLDOSE 666
 
 
 // ======================== TECHNICAL ==============================

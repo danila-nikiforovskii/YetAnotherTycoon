@@ -98,6 +98,8 @@ public:
 
     DNetworkList * NetworkList;
 
+    DNetworkList * RoadList;
+
     vec3 normals[WIDTH+1][HEIGHT+1];
 
     uint LFSR[32];
@@ -182,10 +184,33 @@ public:
 
         void PREPARE_MAGNETS_L();
         void PREPARE_MAGNETS_R();
+
+     void PREPARE_ROAD_MAGNETS_END();
+     void PREPARE_ROAD_MAGNETS_CORNERS();
+
+     void PREPARE_ROAD_MAGNETS_UL();
+     void PREPARE_ROAD_MAGNETS_UR();
+     void PREPARE_ROAD_MAGNETS_DL();
+     void PREPARE_ROAD_MAGNETS_DR();
+
+
+     void PREPARE_ROAD_MAGNETS_HORIZONTAL_SIDES();
+     void PREPARE_ROAD_MAGNETS_U();
+     void PREPARE_ROAD_MAGNETS_D();
+
+
+     void PREPARE_ROAD_MAGNETS_VERTICAL_SIDES();
+
+     void PREPARE_ROAD_MAGNETS_L();
+     void PREPARE_ROAD_MAGNETS_R();
+
+
+
     bool check_obstruction(DNetworkListElement* element);
     bool check_obstruction_conditional(DNetworkListElement * element, QList<DNetworkListElement *> allowed);
 
     void RENDER_NETWORK();//QList<DRailFragment> *network);
+
 
     bool terrain_precedence(int t1, int t2);
 

@@ -39,6 +39,7 @@ DMainScreen::DMainScreen(QWidget *parent): QGLWidget(QGLFormat(QGL::SampleBuffer
     maintimer = this->startTimer(33,Qt::PreciseTimer);
 
     NetworkList = new DNetworkList;
+    RoadList = new DNetworkList;
 }
 
 void DMainScreen::GAMEPLAY_MAIN_MAPINIT()
@@ -1439,8 +1440,10 @@ void DMainScreen::RENDER_DRAW_UI(int mod)
 
             }
 
+        case TOOL_ROAD_PLACE_START:
         case TOOL_RAILROAD_PLACE_START:
             {
+
 
                 //RENDER_GRID();
 
@@ -1534,6 +1537,19 @@ void DMainScreen::RENDER_DRAW_UI(int mod)
             }
 
         case TOOL_RAILROAD_PLACE_END:
+            {
+
+
+                // RENDER_GRID();
+                RENDER_DRAW_MAGNETS(false);
+
+
+                RENDER_PILOT_NETWORK();//&construction_network);
+
+                break;
+            }
+
+        case TOOL_ROAD_PLACE_END:
             {
 
                 // RENDER_GRID();
@@ -1861,6 +1877,7 @@ void DMainScreen::paintGL()
                 RENDER_DRAW_TERRAIN(TERRAIN_MOD_CORNERS_UR);
                 break;
             }
+        case TOOL_ROAD_PLACE_START:
         case TOOL_RAILROAD_PLACE_START:
             {
 
@@ -1878,6 +1895,7 @@ void DMainScreen::paintGL()
                 break;
             }
 
+        case TOOL_ROAD_PLACE_END:
         case TOOL_RAILROAD_PLACE_END:
             {
                 RENDER_DRAW_MAGNETS(true);
@@ -1958,7 +1976,7 @@ void DMainScreen::paintGL()
     // RENDER_BASIC_multiquad(2,2,2,12,4,13,m270);
     RENDER_NETWORK();//&network);
 
-     RENDER_BASIC_multiquad(17,10,17,24,24,31,d0);
+     RENDER_BASIC_multiquad(17,10,5,12,16,18,d0);
 
     RENDER_DRAW_UI(UI_MOD_NONE);
 
@@ -2204,6 +2222,43 @@ void DMainScreen::PREPARE_MAGNETS_END()
 }
 
 
+void DMainScreen::PREPARE_ROAD_MAGNETS_END()
+{
+    // LET'S DEFINE APPROPRIATE FINAL POINTS FOR THIS FRAGMENT ("MAGNETS")
+
+    DESTROY_MAGNETS();
+
+    switch (RailStart.type)
+        {
+        case NetworkNodeTypes::corner:
+
+            {
+                PREPARE_ROAD_MAGNETS_CORNERS();
+                break;
+            }
+
+        case NetworkNodeTypes::vert:
+
+            {
+               PREPARE_ROAD_MAGNETS_VERTICAL_SIDES();
+                break;
+
+
+
+
+            }
+        case NetworkNodeTypes::horiz:
+            {
+
+              PREPARE_ROAD_MAGNETS_HORIZONTAL_SIDES();
+                break;
+            }
+        }
+}
+
+
+
+
 void DMainScreen::mouseMoveEvent(QMouseEvent *event)
 {
     if (READY) {
@@ -2308,9 +2363,64 @@ void DMainScreen::mouseMoveEvent(QMouseEvent *event)
                                                             }
                                                     }
                                             }
-
+                                    break;
                                     }
+
+
+                                case TOOL_ROAD_PLACE_END:
+                                    {
+
+                                        if (LastHoverGroup==HOVER_GROUP_CORNER)
+                                            {
+
+                                                for(QList<DMagnet*>::iterator it=magnets.begin();it!=magnets.end();it++)
+                                                    {
+                                                        if ( ((*it)->address.type==NetworkNodeTypes::corner) && ((*it)->address.i == GetCornerNode(LastHoverID).x()) && ((*it)->address.j == GetCornerNode(LastHoverID).y() ))
+                                                            {
+                                                                HoverMagnet = *it;
+                                                                break;//for
+                                                            }
+                                                    }
+                                            }
+
+                                        if (LastHoverGroup==HOVER_GROUP_HOR_SIDE)
+                                            {
+
+                                                for(QList<DMagnet*>::iterator it=magnets.begin();it!=magnets.end();it++)
+                                                    {
+
+                                                        if ( ((*it)->address.type==NetworkNodeTypes::horiz) && ((*it)->address.i == GetHorSideNode(LastHoverID).x()) && ((*it)->address.j == GetHorSideNode(LastHoverID).y() ))
+                                                            {
+                                                                HoverMagnet = *it;
+
+                                                                break;//for
+                                                            }
+                                                    }
+                                            }
+
+                                        if (LastHoverGroup==HOVER_GROUP_VER_SIDE)
+                                            {
+
+
+                                                for(QList<DMagnet*>::iterator it=magnets.begin();it!=magnets.end();it++)
+                                                    {
+
+                                                        if ( ((*it)->address.type==NetworkNodeTypes::vert) && ((*it)->address.i == GetVerSideNode(LastHoverID).x()) && ((*it)->address.j == GetVerSideNode(LastHoverID).y() ))
+                                                            {
+                                                                HoverMagnet = *it;
+
+                                                                break;//for
+                                                            }
+                                                    }
+                                            }
+                                        break;
+                                    }
+
                                 default: break;
+
+
+
+
                                 }
 
 
@@ -2353,68 +2463,7 @@ int DMainScreen::GetYfromRGB(long unsigned  int rgb)
         }
 }
 
-void DMainScreen::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (READY) {
 
-            switch (event->button()){
-                case Qt::RightButton: moving = false;
-
-                    break;
-                case Qt::LeftButton: zooming = false;
-
-                    switch (CurrentTool)
-                        {
-                        case TOOL_RAILROAD_PLACE_END:
-
-                            {
-                                CurrentTool = TOOL_RAILROAD_PLACE_START;
-
-                                if (HoverMagnet!=nullptr)
-                                    {
-
-                                        if (HoverMagnet->valid)
-                                            {
-
-                                                DMagnet * mag = HoverMagnet;
-
-                                                do {
-                                                        NetworkList->append(mag->newelement);
-
-                                                        NetworkList->last->killUpgraded();
-                                                        NetworkList->last->LinkNodes();
-
-                                                        for ( QList<ObstructionElement>::iterator iter=NetworkList->last->imprint.begin(); iter!=NetworkList->last->imprint.end();iter++)
-                                                            {
-                                                                if (iter->tile.u==1)
-                                                                    obstructions[NetworkList->last->i+iter->adress.x()][NetworkList->last->j+iter->adress.y()].u=NetworkList->last;
-                                                                if (iter->tile.d==1)
-                                                                    obstructions[NetworkList->last->i+iter->adress.x()][NetworkList->last->j+iter->adress.y()].d=NetworkList->last;
-                                                                if (iter->tile.l==1)
-                                                                    obstructions[NetworkList->last->i+iter->adress.x()][NetworkList->last->j+iter->adress.y()].l=NetworkList->last;
-                                                                if (iter->tile.r==1)
-                                                                    obstructions[NetworkList->last->i+iter->adress.x()][NetworkList->last->j+iter->adress.y()].r=NetworkList->last;
-                                                            }
-
-                                                        mag = mag->prev;
-                                                    } while(mag!=nullptr);
-                                            }
-
-                                        DESTROY_MAGNETS();
-                                    }
-
-                            }
-
-                        default: break;
-                        }
-                    break;
-                default: QWidget::mouseReleaseEvent(event);
-                }
-
-
-            update();
-        }
-}
 
 
 void DMainScreen::RENDER_NETWORK()//QList<DRailFragment> *network)
@@ -3079,357 +3128,41 @@ void DMainScreen::RENDER_NETWORK()//QList<DRailFragment> *network)
 
         }
 
-}
 
-
-
-
-
-
-void DMainScreen::mousePressEvent(QMouseEvent *event)
-{
-
-    if (READY)
+    if (RoadList->first!=nullptr)
         {
+            DNetworkListElement * iter = RoadList->first;
 
-            switch (CurrentTool)
+
+
+            while (1)
                 {
-                case TOOL_CHANGE_TERRAIN:
-                    {
-                        switch (event->button())
-                            {
-                            case Qt::RightButton:
-                                {
-                                    break;
-                                }
 
-                            case Qt::LeftButton:
-                                {
-                                    if (LastHoverGroup==HOVER_GROUP_TERRAIN)
-                                        {
-                                            cells[cursor_x][cursor_y].type = (cells[cursor_x][cursor_y].type+1)%16;
-                                        }
-                                    break;
-                                }
-                            default: QWidget::mousePressEvent(event);
-                            }
-                        break;
-                    }
+                    if ((CurrentTool==TOOL_BULLDOSE) && (LastHoverGroup==HOVER_GROUP_TERRAIN) && ( (obstructions[cursor_x][cursor_y].u==iter)||(obstructions[cursor_x][cursor_y].l==iter)||(obstructions[cursor_x][cursor_y].r==iter)||(obstructions[cursor_x][cursor_y].d==iter)))
+                        {
+                            QColor tint;tint.setRgbF(1.0,1.0,0.0);
+                            shader->setUniformValue(shader->uniformLocation("tint"),tint);
+                            shader->setUniformValue(shader->uniformLocation("allwhite"),1);
+                            shader->setUniformValue(shader->uniformLocation("noshade"),1);
+                       }
 
+                    RENDER_BASIC_multiquad(iter->i, iter->j, iter->ax, iter->ay, iter->bx, iter->by, iter->rot );
 
-                case TOOL_LANDSCAPE_UP:
-                    {
-                        switch (event->button())
-                            {
-                            case Qt::RightButton:
-                                {
-                                    break;
-                                }
+                    shader->setUniformValue(shader->uniformLocation("allwhite"),0);
+                    shader->setUniformValue(shader->uniformLocation("noshade"),0);
 
-                            case Qt::LeftButton:
-                                {
-                                    if (LastHoverGroup==HOVER_GROUP_TERRAIN)
-                                        {
-                                            //cells[cursor_x][cursor_y].type = (cells[cursor_x][cursor_y].type+1)%16;
-                                            increaseHeight(cursor_x,cursor_y+1);
-                                            increaseHeight(cursor_x+1,cursor_y+1);
-                                            increaseHeight(cursor_x,cursor_y);
-                                            increaseHeight(cursor_x+1,cursor_y);
-                                            RENDER_BASIC_CALCULATE_NORMALS();
-                                        }
-
-                                    if (LastHoverGroup==HOVER_GROUP_CORNER)
-                                        {
-                                            //cells[cursor_x][cursor_y].type = (cells[cursor_x][cursor_y].type+1)%16;
-                                            int ccx = GetCornerXFromID(LastHoverID);
-                                            int ccy = GetCornerYFromID(LastHoverID);
-                                            int typ = GetCornerTypeFromID(LastHoverID);
-
-                                            switch (typ)
-                                                {
-                                                case CORNER_DL:
-                                                    {
-                                                        increaseHeight(ccx,ccy+1);
-                                                        break;
-                                                    }
-
-                                                case CORNER_DR:
-                                                    {
-                                                        increaseHeight(ccx+1,ccy+1);
-                                                        break;
-                                                    }
-
-                                                case CORNER_UL:
-                                                    {
-                                                        increaseHeight(ccx,ccy);
-                                                        break;
-                                                    }
-
-                                                case CORNER_UR:
-                                                    {
-                                                        increaseHeight(ccx+1,ccy);
-                                                        break;
-                                                    }
-                                                default: break;
-                                                }
-                                            RENDER_BASIC_CALCULATE_NORMALS();
-                                        }
-
-
-
-                                    break;
-                                }
-                            default: QWidget::mousePressEvent(event);
-                            }
-                        break;
-                    }
-
-                case TOOL_LANDSCAPE_DOWN:
-                    {
-
-                        switch (event->button())
-                            {
-                            case Qt::RightButton:
-                                {
-                                    break;
-                                }
-
-                            case Qt::LeftButton:
-                                {
-
-                                    if (LastHoverGroup==HOVER_GROUP_TERRAIN)
-                                        {
-                                            //cells[cursor_x][cursor_y].type = (cells[cursor_x][cursor_y].type+1)%16;
-                                            decreaseHeight(cursor_x,cursor_y+1);
-                                            decreaseHeight(cursor_x+1,cursor_y+1);
-                                            decreaseHeight(cursor_x,cursor_y);
-                                            decreaseHeight(cursor_x+1,cursor_y);
-                                            RENDER_BASIC_CALCULATE_NORMALS();
-                                        }
-
-                                    if (LastHoverGroup==HOVER_GROUP_CORNER)
-                                        {
-                                            //cells[cursor_x][cursor_y].type = (cells[cursor_x][cursor_y].type+1)%16;
-                                            int ccx = GetCornerXFromID(LastHoverID);
-                                            int ccy = GetCornerYFromID(LastHoverID);
-                                            int typ = GetCornerTypeFromID(LastHoverID);
-
-                                            switch (typ)
-                                                {
-                                                case CORNER_DL:
-                                                    {
-                                                        decreaseHeight(ccx,ccy+1);
-                                                        break;
-                                                    }
-
-                                                case CORNER_DR:
-                                                    {
-                                                        decreaseHeight(ccx+1,ccy+1);
-                                                        break;
-                                                    }
-
-                                                case CORNER_UL:
-                                                    {
-                                                        decreaseHeight(ccx,ccy);
-                                                        break;
-                                                    }
-
-                                                case CORNER_UR:
-                                                    {
-                                                        decreaseHeight(ccx+1,ccy);
-                                                        break;
-                                                    }
-                                                default: break;
-                                                }
-                                            RENDER_BASIC_CALCULATE_NORMALS();
-                                        }
-
-                                    break;
-                                }
-                            default: QWidget::mousePressEvent(event);
-                            }
-
-                        break;
-                    }
-
-                case TOOL_TOGGLE_WATER:
-                    {
-                        switch (event->button())
-                            {
-                            case Qt::RightButton:
-                                {
-                                    moving = true;
-                                    movingx = event->x();
-                                    movingy = event->y();
-                                    break;
-                                }
-
-                            case Qt::LeftButton:
-                                {
-                                    if (LastHoverGroup==HOVER_GROUP_TERRAIN)
-                                        {
-                                            if (cells[cursor_x][cursor_y].type==TERRAIN_TYPES_WATER)
-                                                {
-                                                    cells[cursor_x][cursor_y].type=TERRAIN_TYPES_DIRT;
-                                                }
-                                            else
-                                                {
-                                                    cells[cursor_x][cursor_y].type=TERRAIN_TYPES_WATER;
-                                                    map[cursor_x][cursor_y] = -1;
-                                                    map[cursor_x][cursor_y+1] = -1;
-                                                    map[cursor_x+1][cursor_y] = -1;
-                                                    map[cursor_x+1][cursor_y+1] = -1;
-                                                }
-                                        }
-                                    break;
-                                }
-                            default: QWidget::mousePressEvent(event);
-                            }
-
-                    }
-
-                case TOOL_RAILROAD_PLACE_START:
-                    {
-                        switch (event->button())
-                            {
-                            case Qt::RightButton:
-                                {
-                                    moving = true;
-                                    movingx = event->x();
-                                    movingy = event->y();
-                                    break;
-                                }
-
-                            case Qt::LeftButton:
-                                {
-                                    // check if we pressed the proper starting node
-                                    // TODO: just check for node...
-
-                                    bool correct = (LastHoverGroup==HOVER_GROUP_CORNER)||(LastHoverGroup==HOVER_GROUP_HOR_SIDE)||(LastHoverGroup==HOVER_GROUP_VER_SIDE);
-
-                                    if (correct)
-                                        {
-                                         //   if (LastHoverGroup==HOVER_GROUP_HOR_SIDE)
-                                               // correct = (HorizontalSideNodes[GetHorSideNode(LastHoverID).x()][GetHorSideNode(LastHoverID).y()].d==nullptr) || (HorizontalSideNodes[GetHorSideNode(LastHoverID).x()][GetHorSideNode(LastHoverID).y()].u==nullptr);
-
-                                           // if (LastHoverGroup==HOVER_GROUP_VER_SIDE)
-                                              //  correct = (VerticalSideNodes[GetVerSideNode(LastHoverID).x()][GetVerSideNode(LastHoverID).y()].l==nullptr) || (VerticalSideNodes[GetVerSideNode(LastHoverID).x()][GetVerSideNode(LastHoverID).y()].r==nullptr);
-
-                                            if (LastHoverGroup==HOVER_GROUP_CORNER)
-                                                {
-                                                   // correct = ((CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].ul!=nullptr) && (CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].dr!=nullptr)) ||
-                                                    //        ((CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].ur!=nullptr) && (CornerNodes[GetCornerNode(LastHoverID).x()][GetCornerNode(LastHoverID).y()].dl!=nullptr));
-                                                    //correct =!correct;
-                                                }
-                                        }
-
-
-                                    magnets.clear();
-                                    if (correct)
-                                        {
-                                            HoverMagnet = nullptr;
-
-                                            CurrentTool = TOOL_RAILROAD_PLACE_END;
-
-                                            if (LastHoverGroup == HOVER_GROUP_CORNER)
-                                                {
-                                                    // RailStart = DNetworkNode(GetCornerNode(LastHoverID).x(),GetCornerNode(LastHoverID).y(),Orientations::Node);
-                                                    RailStart.i=GetCornerNode(LastHoverID).x();
-                                                    RailStart.j=GetCornerNode(LastHoverID).y();
-                                                    RailStart.type = NetworkNodeTypes::corner;
-                                                }
-
-                                            if (LastHoverGroup == HOVER_GROUP_HOR_SIDE)
-                                                {
-                                                    // RailStart = DNetworkNode(GetCornerNode(LastHoverID).x(),GetCornerNode(LastHoverID).y(),Orientations::Node);
-                                                    RailStart.i=GetHorSideNode(LastHoverID).x();
-                                                    RailStart.j=GetHorSideNode(LastHoverID).y();
-                                                    RailStart.type = NetworkNodeTypes::horiz;
-                                                }
-
-                                            if (LastHoverGroup == HOVER_GROUP_VER_SIDE)
-                                                {
-                                                    RailStart.i=GetVerSideNode(LastHoverID).x();
-                                                    RailStart.j=GetVerSideNode(LastHoverID).y();
-                                                    RailStart.type = NetworkNodeTypes::vert;
-                                                }
-
-
-
-                                            PREPARE_MAGNETS_END();
-
-                                        }
-                                    else
-                                        {
-                                            //error...
-                                        }
-
-                                    break;
-                                }
-
-                            default: QWidget::mousePressEvent(event);
-                            }
-
-                        break;
-                    }
-
-                case TOOL_BULLDOSE:
-                    {
-                        switch (event->button())
-                            {
-                            case Qt::RightButton:
-                                {
-                                    moving = true;
-                                    movingx = event->x();
-                                    movingy = event->y();
-                                    break;
-                                }
-
-                            case Qt::LeftButton:
-                                {
-
-                                    if (LastHoverGroup == HOVER_GROUP_TERRAIN)
-                                        {
-                                            bulldose_rail(obstructions[cursor_x][cursor_y].u);
-                                            bulldose_rail(obstructions[cursor_x][cursor_y].l);
-                                            bulldose_rail(obstructions[cursor_x][cursor_y].d);
-                                            bulldose_rail(obstructions[cursor_x][cursor_y].r);
-                                           }
-
-                                    // check if we pressed the something like UI element or active entity like train...
-                                    break;
-                                }
-                            default: QWidget::mousePressEvent(event);
-                            }
-                        break;
-                    }
-
-
-
-                default:// also TOOL_NONE
-                    {
-                        switch (event->button())
-                            {
-                            case Qt::RightButton:
-                                {
-                                    moving = true;
-                                    movingx = event->x();
-                                    movingy = event->y();
-                                    break;
-                                }
-
-                            case Qt::LeftButton:
-                                {
-                                    // check if we pressed the something like UI element or active entity like train...
-                                    break;
-                                }
-                            default: QWidget::mousePressEvent(event);
-                            }
-                    }
-
+                    if (iter->next == nullptr) break;
+                    iter=iter->next;
                 }
-        }
+           }
+
+
 }
+
+
+
+
+
 
 
 void DMainScreen::bulldose_rail(DNetworkListElement* dead)
@@ -4182,6 +3915,11 @@ void DMainScreen::keyPressEvent(QKeyEvent *event)
 
         case Qt::Key_8:
             CurrentTool = TOOL_BULLDOSE;
+            break;
+
+
+        case Qt::Key_R:
+            CurrentTool = TOOL_ROAD_PLACE_START;
             break;
 
         case Qt::Key_A:
