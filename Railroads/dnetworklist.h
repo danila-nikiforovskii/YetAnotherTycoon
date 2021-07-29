@@ -5,6 +5,8 @@
 
 #include <dnetworknode.h>
 #include <QDebug>
+
+
 enum RailTypes
 {
     forgotten = -1,
@@ -118,10 +120,77 @@ enum RailTypes
     TwoTrackJunctionU_UL,
     TwoTrackJunctionU_UR,
     TwoTrackJunctionUR_U,
-    TwoTrackJunctionUR_R
+    TwoTrackJunctionUR_R,
+
+    // ====================
+    RoadHoriz = 1000,
+    RoadVert,
+    RoadULDR,
+    RoadDRUL = RoadULDR,
+    RoadURDL,
+    RoadDLUR = RoadURDL,
+
+    RoadTurnUR,
+    RoadTurnDR,
+    RoadTurnUL,
+    RoadTurnDL,
+
+    RoadTurnULUR,
+    RoadTurnURUL = RoadTurnULUR,
+
+    RoadTurnULDL,
+    RoadTurnDLUL = RoadTurnULDL,
+
+    RoadTurnDLDR,
+    RoadTurnDRDL = RoadTurnDLDR,
+
+    RoadTurnDRUR,
+    RoadTurnURDR = RoadTurnDRUR,
 
 
-    // PLACEHOLDERS for crossings, X-junctions et al.
+    RoadTurn_U_UL,
+    RoadTurn_DR_D = RoadTurn_U_UL,
+
+    RoadTurn_U_UR,
+    RoadTurn_DL_D = RoadTurn_U_UR,
+
+    RoadTurn_D_DL,
+    RoadTurn_UR_U = RoadTurn_D_DL,
+
+    RoadTurn_D_DR,
+    RoadTurn_UL_U = RoadTurn_D_DR,
+
+    RoadTurn_L_DL,
+    RoadTurn_UR_R = RoadTurn_L_DL,
+
+    RoadTurn_L_UL,
+    RoadTurn_DR_R = RoadTurn_L_UL,
+
+    RoadTurn_R_UR,
+    RoadTurn_DL_L = RoadTurn_R_UR,
+
+    RoadTurn_R_DR,
+    RoadTurn_UL_L = RoadTurn_R_DR,
+
+
+
+
+
+
+
+    RoadTCrossU,
+    RoadTCrossR,
+    RoadTCrossD,
+    RoadTCrossL,
+
+    RoadTCrossUR,
+    RoadTCrossUL,
+    RoadTCrossDR,
+    RoadTCrossDL,
+
+    RoadXCross,
+    RoadXCrossDIAG
+
 };
 
 class DNetworkList;
@@ -1875,6 +1944,468 @@ class TwoTrackJunctionUR_R: public DNetworkListElement
         DVerticalSideNode *rd;
 };
 */
+
+// ============================= ROADS ==============================================
+
+
+// =============== straights ==================
+class RoadVert:public DNetworkListElement
+{
+        public:
+        RoadVert() {     ax = 5;
+                             ay = 14;
+                             bx = 5;
+                             by = 14;
+                             rot = d0;
+                            AppendFULL(0,0);
+                             type = RailTypes::RoadVert;
+                       }
+        void LinkNodes(){u->d=this;d->u=this;}
+        void kill(){u->d = nullptr; d->u = nullptr;erase();}
+    DHorizontalSideNode * u;
+    DHorizontalSideNode * d;
+};
+
+class RoadHoriz:public DNetworkListElement
+{
+        public:
+        RoadHoriz() {           ax = 5;
+                                    ay = 14;
+                                   bx = 5;
+                                   by = 14;
+                                    rot = d90;
+                                   AppendFULL(0,0);
+                               type = RailTypes::RoadHoriz;
+                        }
+        void LinkNodes(){l->r=this;r->l=this;}
+        void kill(){l->r = nullptr; r->l = nullptr;erase();}
+        DVerticalSideNode *l;
+        DVerticalSideNode *r;
+};
+
+
+// ================ diags =======================
+class RoadULDR: public DNetworkListElement
+{
+    public:
+        RoadULDR(){        ax =8 ;
+                            ay = 14;
+                           bx = 8;
+                            by = 14;
+                            rot = m0;
+
+                            AppendFULL(0,0);
+                             type = RailTypes::RoadULDR;
+                  }
+        void LinkNodes(){ul->dr=this;dr->ul=this;}
+        void kill(){ul->dr = nullptr; dr->ul = nullptr;erase();}
+    DCornerNode * ul;
+    DCornerNode * dr;
+};
+
+class RoadURDL:public DNetworkListElement
+{
+        public:
+        RoadURDL(){        ax = 8 ;
+                           ay = 14;
+                           bx = 8;
+                           by = 14;
+                           rot = d0;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadURDL;
+                  }
+        void LinkNodes(){ur->dl=this;dl->ur=this;}
+        void kill(){ur->dl = nullptr; dl->ur = nullptr;erase();}
+    DCornerNode * ur;
+    DCornerNode * dl;
+};
+
+
+//===========  tight turns ==========
+
+class RoadTurnUR:public DNetworkListElement
+{
+        public:
+        RoadTurnUR(){        ax =5 ;
+                           ay = 15;
+                           bx = 5;
+                           by = 15;
+                           rot = d0;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTurnUR;
+                  }
+        void LinkNodes(){u->d =this;r->l=this;}
+        void kill(){u->d = nullptr; r->l = nullptr;erase();}
+
+        DHorizontalSideNode * u;
+        DVerticalSideNode * r;
+
+};
+
+class RoadTurnDR:public DNetworkListElement
+{
+        public:
+        RoadTurnDR(){        ax =5 ;
+                           ay = 15;
+                           bx = 5;
+                           by = 15;
+                           rot = d90;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTurnDR;
+                  }
+        void LinkNodes(){d->u=this;r->l=this;}
+        void kill(){d->u = nullptr; r->l = nullptr;erase();}
+        DHorizontalSideNode * d;
+        DVerticalSideNode * r;
+};
+
+class RoadTurnDL:public DNetworkListElement
+{
+        public:
+        RoadTurnDL(){        ax =5 ;
+                           ay = 15;
+                           bx = 5;
+                           by = 15;
+                           rot = d180;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTurnDL;
+                  }
+        void LinkNodes(){d->u=this;l->r=this;}
+        void kill(){d->u = nullptr; l->r = nullptr;erase();}
+        DHorizontalSideNode * d;
+        DVerticalSideNode * l;
+};
+
+class RoadTurnUL:public DNetworkListElement
+{
+        public:
+        RoadTurnUL(){        ax =5 ;
+                           ay = 15;
+                           bx = 5;
+                           by = 15;
+                           rot = d270;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTurnUL;
+                  }
+        void LinkNodes(){u->d=this;l->r=this;}
+        void kill(){u->d = nullptr; l->r = nullptr;erase();}
+        DHorizontalSideNode * u;
+        DVerticalSideNode * l;
+};
+
+// ============= diag turns ===========
+
+
+class RoadTurnULUR:public DNetworkListElement
+{
+        public:
+        RoadTurnULUR(){        ax =6 ;
+                           ay = 13;
+                           bx = 6;
+                           by = 13;
+                           rot = d0;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTurnULUR;
+                  }
+        void LinkNodes(){ur->dl=this;ul->dr=this;}
+        void kill(){ur->dl = nullptr; ul->dr = nullptr;erase();}
+    DCornerNode * ul;
+    DCornerNode * ur;
+};
+
+
+
+class RoadTurnULDL:public DNetworkListElement
+{
+        public:
+        RoadTurnULDL(){        ax =6 ;
+                           ay = 13;
+                           bx = 6;
+                           by = 13;
+                           rot = d270;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTurnULDL;
+                  }
+        void LinkNodes(){ul->dr=this;dl->ur=this;}
+        void kill(){ul->dr = nullptr; dl->ur = nullptr;erase();}
+    DCornerNode * ul;
+    DCornerNode * dl;
+};
+
+
+class RoadTurnDLDR:public DNetworkListElement
+{
+        public:
+        RoadTurnDLDR(){        ax =6 ;
+                           ay = 13;
+                           bx = 6;
+                           by = 13;
+                           rot = d180;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTurnDLDR;
+                  }
+        void LinkNodes(){dr->ul=this;dl->ur=this;}
+        void kill(){dr->ul = nullptr; dl->ur = nullptr;erase();}
+    DCornerNode * dr;
+    DCornerNode * dl;
+};
+
+class RoadTurnDRUR:public DNetworkListElement
+{
+        public:
+        RoadTurnDRUR(){        ax =6 ;
+                           ay = 13;
+                           bx = 6;
+                           by = 13;
+                           rot = d90;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTurnDRUR;
+                  }
+        void LinkNodes(){ur->dl=this;dr->ul=this;}
+        void kill(){ur->dl = nullptr; dr->ul = nullptr;erase();}
+    DCornerNode * dr;
+    DCornerNode * ur;
+};
+
+// === T-CROSSINGS ===
+
+class RoadTCrossU:public DNetworkListElement
+{
+        public:
+        RoadTCrossU(){        ax =6 ;
+                           ay = 14;
+                           bx = 6;
+                           by = 14;
+                           rot = d270;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTCrossU;
+                  }
+        void LinkNodes(){r->l=this;l->r=this;u->d=this;}
+        void kill(){r->l = nullptr; l->r = nullptr; u->d=nullptr; erase();}
+    DVerticalSideNode *l;
+    DVerticalSideNode *r;
+    DHorizontalSideNode *u;
+};
+
+
+class RoadTCrossR:public DNetworkListElement
+{
+        public:
+        RoadTCrossR(){        ax =6 ;
+                           ay = 14;
+                           bx = 6;
+                           by = 14;
+                           rot = d0;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTCrossR;
+                  }
+        void LinkNodes(){u->d=this;d->u=this;r->l=this;}
+        void kill(){u->d = nullptr; d->u = nullptr;r->l=nullptr;erase();}
+
+    DHorizontalSideNode *u;
+    DHorizontalSideNode *d;
+    DVerticalSideNode *r;
+};
+
+class RoadTCrossD:public DNetworkListElement
+{
+        public:
+        RoadTCrossD(){        ax =6 ;
+                           ay = 14;
+                           bx = 6;
+                           by = 14;
+                           rot = d90;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTCrossD;
+                  }
+        void LinkNodes(){r->l=this;l->r=this;u->d=this;}
+        void kill(){r->l = nullptr; l->r = nullptr; u->d=nullptr;erase();}
+        DVerticalSideNode *l;
+        DVerticalSideNode *r;
+        DHorizontalSideNode *u;
+};
+
+class RoadTCrossL:public DNetworkListElement
+{
+        public:
+        RoadTCrossL(){        ax =6 ;
+                           ay = 14;
+                           bx = 6;
+                           by = 14;
+                           rot = d180;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTCrossL;
+                  }
+        void LinkNodes(){u->d=this;d->u=this;l->r=this;}
+        void kill(){u->d = nullptr; d->u = nullptr;l->r=nullptr;erase();}
+
+        DHorizontalSideNode *u;
+        DHorizontalSideNode *d;
+        DVerticalSideNode *l;
+};
+
+//==== diag t-cross
+
+class RoadTCrossUL:public DNetworkListElement
+{
+        public:
+        RoadTCrossUL(){        ax =7 ;
+                           ay = 13;
+                           bx = 7;
+                           by = 13;
+                           rot = d270;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTCrossUL;
+                  }
+        void LinkNodes(){ur->dl=this;dl->ur=this;ul->dr=this;}
+        void kill(){ur->dl = nullptr; dl->ur = nullptr;ul->dr=nullptr;erase();}
+
+    DCornerNode * ul;
+    DCornerNode * dl;
+    DCornerNode * ur;
+};
+
+class RoadTCrossUR:public DNetworkListElement
+{
+        public:
+        RoadTCrossUR(){        ax =7;
+                           ay = 13;
+                           bx = 7;
+                           by = 13;
+                           rot = d0;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTCrossUR;
+                  }
+        void LinkNodes(){ur->dl=this;ul->dr=this;dr->ul=this;}
+        void kill(){ur->dl = nullptr; ul->dr = nullptr;dr->ul=nullptr;erase();}
+    DCornerNode * ur;
+    DCornerNode * ul;
+    DCornerNode * dr;
+
+};
+
+class RoadTCrossDL:public DNetworkListElement
+{
+        public:
+        RoadTCrossDL(){        ax =7 ;
+                           ay = 13;
+                           bx = 7;
+                           by = 13;
+                           rot = d180;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTCrossDL;
+                  }
+        void LinkNodes(){ul->dr=this;dl->ur=this;dr->ul=this;}
+        void kill(){ul->dr = nullptr; dl->ur = nullptr;dr->ul=this;erase();}
+    DCornerNode * ul;
+    DCornerNode * dr;
+    DCornerNode * dl;
+};
+
+class RoadTCrossDR:public DNetworkListElement
+{
+        public:
+        RoadTCrossDR(){        ax =7 ;
+                           ay = 13;
+                           bx = 7;
+                           by = 13;
+                           rot = d90;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadTCrossDR;
+                  }
+        void LinkNodes(){ur->dl=this;dl->ur=this;dr->ul=this;}
+        void kill(){ur->dl = nullptr; dl->ur = nullptr;dr->ul=this;erase();}
+    DCornerNode * dl;
+    DCornerNode * ur;
+    DCornerNode * dr;
+};
+
+// ============== X-CROSS
+
+class RoadXCross:public DNetworkListElement
+{
+        public:
+        RoadXCross(){        ax =5 ;
+                           ay = 12;
+                           bx = 5;
+                           by = 12;
+                           rot = d0;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadXCross;
+                  }
+        void LinkNodes(){u->d=this;d->u=this;l->r=this;r->l=this;}
+        void kill(){u->d = nullptr; l->r = nullptr; d->u=nullptr;r->l=nullptr;erase();}
+
+        DHorizontalSideNode *u;
+        DHorizontalSideNode *d;
+
+        DVerticalSideNode *l;
+        DVerticalSideNode *r;
+
+};
+
+class RoadXCrossDIAG:public DNetworkListElement
+{
+        public:
+        RoadXCrossDIAG(){        ax =8 ;
+                           ay = 13;
+                           bx = 8;
+                           by = 13;
+                           rot = d0;
+                            AppendFULL(0,0);
+                           type = RailTypes::RoadXCrossDIAG;
+                  }
+        void LinkNodes(){ur->dl=this;dl->ur=this;ul->dr=this;dr->ul=this;}
+        void kill(){ur->dl = nullptr; dl->ur = nullptr;ul->dr=nullptr;dr->ul=nullptr;erase();}
+
+        DCornerNode * ur;
+        DCornerNode * dl;
+        DCornerNode * ul;
+        DCornerNode * dr;
+};
+
+// =============== side to corners road turns ==========
+
+
+class RoadTurn_U_UL:public DNetworkListElement
+{
+    public:
+    RoadTurn_U_UL(){        ax = 7 ;
+                       ay = 15;
+                       bx = 7;
+                       by = 15;
+                       rot = d270;
+                        AppendFULL(0,0);
+                       type = RailTypes::RoadTurn_U_UL;
+              }
+    void LinkNodes(){d->u=this;ul->dr=this;}
+    void kill(){d->u = nullptr; ul->dr = nullptr;erase();}
+
+    DHorizontalSideNode * d;
+    DCornerNode * ul;
+};
+
+
+class RoadTurn_U_UR:public DNetworkListElement
+{
+    public:
+    RoadTurn_U_UR(){        ax = 7 ;
+                       ay = 15;
+                       bx = 7;
+                       by = 15;
+                       rot = m90;
+                        AppendFULL(0,0);
+                       type = RailTypes::RoadTurn_U_UR;
+              }
+    void LinkNodes(){d->u=this;ur->dl=this;}
+    void kill(){d->u = nullptr; ur->dl = nullptr;erase();}
+
+    DHorizontalSideNode * d;
+    DCornerNode * ur;
+};
+
+ // to do
+
 
 // ====================== END =====================
 

@@ -18,6 +18,17 @@ SOURCES += \
     DMagnetsUL.cpp \
     DMagnetsUR.cpp \
     DRandom.cpp \
+    DRoadMagnets.cpp \
+    DRoadMagnetsD.cpp \
+    DRoadMagnetsDL.cpp \
+    DRoadMagnetsDR.cpp \
+    DRoadMagnetsL.cpp \
+    DRoadMagnetsR.cpp \
+    DRoadMagnetsU.cpp \
+    DRoadMagnetsUL.cpp \
+    DRoadMagnetsUR.cpp \
+    MousePressEvents.cpp \
+    MouseReleaseEvents.cpp \
     dloco.cpp \
     dmagnets.cpp \
     dmainscreen.cpp \
@@ -25,6 +36,7 @@ SOURCES += \
     dnetworknode.cpp \
     dplayer.cpp \
     drailfragment.cpp \
+    droadlist.cpp \
     dterraincell.cpp \
     main.cpp \
     mainwindow.cpp
@@ -37,6 +49,7 @@ HEADERS += \
     dnetworknode.h \
     dplayer.h \
     drailfragment.h \
+    droadlist.h \
     dterraincell.h \
     mainwindow.h
 
