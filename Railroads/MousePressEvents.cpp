@@ -406,7 +406,102 @@ void DMainScreen::mousePressEvent(QMouseEvent *event)
                         break;
                     }
 
+                case TOOL_TEMP_SPAWNLOCO:
+                    {
+                        switch (event->button())
+                            {
+                            case Qt::RightButton:
+                                {
+                                    moving = true;
+                                    movingx = event->x();
+                                    movingy = event->y();
+                                    break;
+                                }
 
+                            case Qt::LeftButton:
+                                {
+
+                                    if (LastHoverGroup == HOVER_GROUP_TERRAIN)
+                                        {
+                                          //  bulldose_rail(obstructions[cursor_x][cursor_y].u);
+                                          //  bulldose_rail(obstructions[cursor_x][cursor_y].l);
+                                          //  bulldose_rail(obstructions[cursor_x][cursor_y].d);
+                                           // bulldose_rail(obstructions[cursor_x][cursor_y].r);
+
+
+                                            DNetworkListElement* rail = nullptr;
+
+                                            if (obstructions[cursor_x][cursor_y].u!=nullptr)
+                                                rail = obstructions[cursor_x][cursor_y].u;
+                                            else
+                                                {
+                                                if (obstructions[cursor_x][cursor_y].l!=nullptr)
+                                                    rail = obstructions[cursor_x][cursor_y].l;
+                                                else {
+                                                        if (obstructions[cursor_x][cursor_y].r!=nullptr)
+                                                            rail = obstructions[cursor_x][cursor_y].r;
+                                                        else {
+                                                                if (obstructions[cursor_x][cursor_y].d!=nullptr)
+                                                                    rail = obstructions[cursor_x][cursor_y].d;
+                                                            }
+                                                       }
+
+                                                }
+
+                                            if (rail!=nullptr)
+                                                {
+
+                                                    DLoco * newloco = new DLoco();
+                                                    newloco->v = 0.10;
+
+                                                    switch (rail->type)
+                                                        {
+                                                        case straightVert:
+                                                            {
+                                                                newloco->path = static_cast<class straightVert*>(rail)->d->path_u_main;
+                                                                newloco->x=static_cast<class straightVert*>(rail)->d->i+0.5;
+                                                                newloco->y=static_cast<class straightVert*>(rail)->d->j;
+                                                                newloco->d=dir_u;
+                                                                newloco->t= 0;
+                                                                newloco->nextpointindex=1;
+                                                                LocoList.append(*newloco);
+                                                                break;
+
+                                                            }
+
+                                                        case straightHoriz:
+                                                            {
+                                                                newloco->path = static_cast<class straightHoriz*>(rail)->l->path_r_main;
+                                                                newloco->x=static_cast<class straightHoriz*>(rail)->l->i;
+                                                                newloco->y=static_cast<class straightHoriz*>(rail)->l->j+0.5;
+                                                                newloco->d=dir_r;
+                                                                newloco->t= 0;
+                                                                newloco->nextpointindex=1;
+                                                                LocoList.append(*newloco);
+                                                                break;
+                                                            }
+
+
+                                                        default:
+                                                            break;
+
+                                                        }
+
+                                                    delete newloco;
+
+
+                                                }
+
+
+                                         }
+
+                                    // check if we pressed the something like UI element or active entity like train...
+                                    break;
+                                }
+                            default: QWidget::mousePressEvent(event);
+                            }
+                        break;
+                    }
 
                 default:// also TOOL_NONE
                     {

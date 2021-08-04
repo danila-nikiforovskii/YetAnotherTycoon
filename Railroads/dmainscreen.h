@@ -13,6 +13,8 @@
 #include <dnetworknode.h>
 #include <drailfragment.h>
 #include <dnetworklist.h>
+#include <dloco.h>
+#include <dpath.h>
 
 struct vec3 { GLfloat x; GLfloat y; GLfloat z;};
 
@@ -100,6 +102,7 @@ public:
 
     DNetworkList * RoadList;
 
+    QList<DLoco> LocoList;
     vec3 normals[WIDTH+1][HEIGHT+1];
 
     uint LFSR[32];
@@ -110,7 +113,9 @@ public:
     unsigned long long DRandom();
     void Randomize();
     float DFloatRandom();
-    int maintimer;
+    int painttimer;
+    int ticktimer;
+
 
 
     int waterframe;
@@ -143,7 +148,8 @@ public:
     bool show_edge = false;
     bool OpenGL_INIT = false;
 
-
+    int paint_timer_interval;
+    int tick_timer_interval;
 
 
    // QList<DRailFragment> network;
@@ -250,7 +256,10 @@ public:
     GLfloat getYfromVec3 (vec3 vec);
 
 
-    void RENDER_DRAW_3D_CAR (int i, int j, GLfloat degree);
+    void RENDER_DRAW_3D_CAR (GLfloat i, GLfloat j, GLfloat degree);
+
+    void RENDER_STOCK();
+
     void RENDER_3D_QUAD (GLfloat centroid_x, GLfloat centroid_y, vec3 vert1, vec3 vert2, vec3 vert3, vec3 vert4);
     //
     //    2  4

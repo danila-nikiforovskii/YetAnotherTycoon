@@ -30,6 +30,7 @@ void DMainScreen::mouseReleaseEvent(QMouseEvent *event)
 
                                                         NetworkList->last->killUpgraded();
                                                         NetworkList->last->LinkNodes();
+                                                        NetworkList->last->LinkPaths();
 
                                                         for ( QList<ObstructionElement>::iterator iter=NetworkList->last->imprint.begin(); iter!=NetworkList->last->imprint.end();iter++)
                                                             {

@@ -12,12 +12,19 @@ void DMainScreen::Randomize()
       for (int i=0;i<32;i++)
           CAR_1[i]= LFSR[31-i];
       //init LFSR state
+
+
 }
 
 
 uint XNOR(uint a, uint b)
 {
     return a==b?1:0;
+}
+
+uint XOR(uint a, uint b)
+{
+    return a==b?0:1;
 }
 
 unsigned long long DMainScreen::DRandom()
@@ -35,13 +42,13 @@ unsigned long long DMainScreen::DRandom()
    LFSR[0] = XNOR(XNOR(XNOR(temp[31],temp[21]),temp[1]),temp[0]);
 
 
-   for (int counts = 0; counts < (seed%64); counts++){
+   for (uint counts = 0; counts < (seed%64); counts++){
 
    for (int i=0;i<32;i++)
        temp[i]=CAR_1[i];
 }
 
-    for (int i=0;i<32;i++)
+    for (uint i=0;i<32;i++)
         {
             uint left,right;
 
@@ -96,7 +103,8 @@ unsigned long long DMainScreen::DRandom()
 
    for (int i=0;i<32;i++)
        {
-    total += (XNOR(LFSR[i],CAR_1[i])<<i);
+  //  total += (XNOR(LFSR[i],CAR_1[i])<<i);
+             total += (XOR(LFSR[i],CAR_1[i])<<i);
 
        }
 

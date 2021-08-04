@@ -39,7 +39,8 @@ SOURCES += \
     droadlist.cpp \
     dterraincell.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    dpath.cpp
 
 HEADERS += \
     defines.h \
@@ -51,7 +52,8 @@ HEADERS += \
     drailfragment.h \
     droadlist.h \
     dterraincell.h \
-    mainwindow.h
+    mainwindow.h \
+    dpath.h
 
 FORMS += \
     mainwindow.ui

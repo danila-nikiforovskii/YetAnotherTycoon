@@ -5,6 +5,7 @@
 #include <defines.h>
 #include <QList>
 
+#include <dpath.h>
 
 enum NetworkNodeTypes
 {
@@ -80,6 +81,8 @@ class DNetworkNode
     static QPoint medianD(int i, int j);
 
 
+
+
 };
 
 class DHorizontalSideNode : public DNetworkNode
@@ -93,6 +96,11 @@ class DHorizontalSideNode : public DNetworkNode
 
     DNetworkListElement * u = nullptr;
     DNetworkListElement * d = nullptr;
+
+    DPath *path_u_main = nullptr;
+    DPath *path_u_side = nullptr;
+    DPath *path_d_main = nullptr;
+    DPath *path_d_side = nullptr;
 };
 
 class DVerticalSideNode : public DNetworkNode
@@ -106,6 +114,11 @@ class DVerticalSideNode : public DNetworkNode
 
    DNetworkListElement * l = nullptr;
    DNetworkListElement * r  = nullptr;
+
+   DPath *path_l_main = nullptr;
+   DPath *path_l_side = nullptr;
+   DPath *path_r_main = nullptr;
+   DPath *path_r_side = nullptr;
 
 };
 
@@ -127,6 +140,16 @@ class DCornerNode: public DNetworkNode
    DNetworkListElement *ur = nullptr;
    DNetworkListElement *dl  = nullptr;
    DNetworkListElement *dr = nullptr;
+
+   DPath * path_ul_main = nullptr;
+   DPath * path_ul_side = nullptr;
+   DPath * path_dr_main = nullptr;
+   DPath * path_dr_side = nullptr;
+
+   DPath * path_ur_main = nullptr;
+   DPath * path_ur_side = nullptr;
+   DPath * path_dl_main = nullptr;
+   DPath * path_dl_side = nullptr;
 };
 
 #endif // DNETWORKNODE_H

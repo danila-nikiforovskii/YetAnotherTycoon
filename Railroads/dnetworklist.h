@@ -8,7 +8,7 @@
 
 
 enum RailTypes
-{
+    {
     forgotten = -1,
     straightVert = 0,
     straightHoriz,
@@ -191,12 +191,12 @@ enum RailTypes
     RoadXCross,
     RoadXCrossDIAG
 
-};
+    };
 
 class DNetworkList;
 
 enum texture_rotation
-{
+    {
     d0 = 0,
     d90,
     d180,
@@ -205,53 +205,54 @@ enum texture_rotation
     m90,
     m180,
     m270
-};
+    };
 
 
 struct ObstructionTile
 {
-int u =0;
-int l =0;
-int r =0;
-int d =0;
-//   -----=
-//  |\ u  /|
-//  | \  / |
-//  |l \/ r|
-//  |  /\  |
-//  | /  \ |
-//  |/ d  \|
-//  -------
+    int u =0;
+    int l =0;
+    int r =0;
+    int d =0;
+    //   -----=
+    //  |\ u  /|
+    //  | \  / |
+    //  |l \/ r|
+    //  |  /\  |
+    //  | /  \ |
+    //  |/ d  \|
+    //  -------
 };
 
 
 
 struct ObstructionElement
 {
-        ObstructionTile tile;
-        QPoint adress;
+    ObstructionTile tile;
+    QPoint adress;
 };
 
 class DNetworkListElement
 {
-     public:
-        DNetworkListElement();
-        DNetworkList *list = nullptr;
-        DNetworkListElement *prev =nullptr;
-        DNetworkListElement *next =nullptr;
-        virtual ~DNetworkListElement();
-        virtual void kill() {erase();};
-        virtual void killUpgraded() {};
-        void erase();
-        virtual void LinkNodes(){};
-        RailTypes type = forgotten;
-        int i,j;
-        int ax,ay;
-        int bx,by;
-        texture_rotation rot;
-        QList<ObstructionElement> imprint;
+public:
+    DNetworkListElement();
+    DNetworkList *list = nullptr;
+    DNetworkListElement *prev =nullptr;
+    DNetworkListElement *next =nullptr;
+    virtual ~DNetworkListElement();
+    virtual void kill() {erase();}
+    virtual void killUpgraded() {}
+    void erase();
+    virtual void LinkNodes(){}
+    virtual void LinkPaths(){}
+    RailTypes type = forgotten;
+    int i,j;
+    int ax,ay;
+    int bx,by;
+    texture_rotation rot;
+    QList<ObstructionElement> imprint;
 
-        void AppendObstructionElement(int u, int l, int r, int d,int i,int j)
+    void AppendObstructionElement(int u, int l, int r, int d,int i,int j)
         {
             ObstructionElement element;
             element.tile.u=u;
@@ -261,26 +262,26 @@ class DNetworkListElement
             element.adress.setX(i);
             element.adress.setY(j);
             imprint.append(element);
-        };
+        }
 
-        void AppendFULL(int i,int j)
+    void AppendFULL(int i,int j)
         {
             AppendObstructionElement(1,1,1,1,i,j);
         }
-        void AppendUL(int i,int j)
+    void AppendUL(int i,int j)
         {
             AppendObstructionElement(1,1,0,0,i,j);
         }
-        void AppendUR(int i,int j)
+    void AppendUR(int i,int j)
         {
             AppendObstructionElement(1,0,1,0,i,j);
         }
 
-        void AppendDL(int i,int j)
+    void AppendDL(int i,int j)
         {
             AppendObstructionElement(0,1,0,1,i,j);
         }
-        void AppendDR(int i,int j)
+    void AppendDR(int i,int j)
         {
             AppendObstructionElement(0,0,1,1,i,j);
         }
@@ -288,78 +289,49 @@ class DNetworkListElement
 
 };
 
-
-
-
-
 // =============== straights ==================
 class straightVert:public DNetworkListElement
 {
-        public:
-        straightVert() {     ax = 0;
-                             ay = 12;
-                             bx = 0;
-                             by = 12;
-                             rot = d0;
-                            AppendFULL(0,0);
-                             type = RailTypes::straightVert;
-                       }
-        void LinkNodes(){u->d=this;d->u=this;}
-        void kill(){u->d = nullptr; d->u = nullptr;erase();}
+public:
+    straightVert();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
     DHorizontalSideNode * u;
     DHorizontalSideNode * d;
 };
 
 class straightHoriz:public DNetworkListElement
 {
-        public:
-        straightHoriz() {           ax = 0;
-                                    ay = 12;
-                                   bx = 0;
-                                   by = 12;
-                                    rot = d90;
-                                   AppendFULL(0,0);
-                               type = RailTypes::straightHoriz;
-                        }
-        void LinkNodes(){l->r=this;r->l=this;}
-        void kill(){l->r = nullptr; r->l = nullptr;erase();}
-        DVerticalSideNode *l;
-        DVerticalSideNode *r;
+public:
+    straightHoriz();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
+    DVerticalSideNode *l;
+    DVerticalSideNode *r;
 };
 
 
 // ================ diags =======================
 class diagULDR: public DNetworkListElement
 {
-    public:
-        diagULDR(){        ax =1 ;
-                            ay = 12;
-                           bx = 1;
-                            by = 12;
-                            rot = d90;
-
-                            AppendFULL(0,0);
-                             type = RailTypes::diagULDR;
-                  }
-        void LinkNodes(){ul->dr=this;dr->ul=this;}
-        void kill(){ul->dr = nullptr; dr->ul = nullptr;erase();}
+public:
+    diagULDR();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
     DCornerNode * ul;
     DCornerNode * dr;
 };
 
 class diagURDL:public DNetworkListElement
 {
-        public:
-        diagURDL(){        ax =1 ;
-                           ay = 12;
-                           bx = 1;
-                           by = 12;
-                           rot = d0;
-                            AppendFULL(0,0);
-                           type = RailTypes::diagURDL;
-                  }
-        void LinkNodes(){ur->dl=this;dl->ur=this;}
-        void kill(){ur->dl = nullptr; dl->ur = nullptr;erase();}
+public:
+    diagURDL();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
     DCornerNode * ur;
     DCornerNode * dl;
 };
@@ -369,32 +341,20 @@ class diagURDL:public DNetworkListElement
 
 class tight_UR_R:   public DNetworkListElement
 {public:
-    tight_UR_R(){                    ax =2 ;
-                                     ay = 12;
-                                     bx = 4;
-                                     by = 13;
-                                     rot = d180;
-AppendFULL(0,1);AppendUL(1,1);AppendDR(1,0);AppendFULL(2,0);
-                             type = RailTypes::tight_UR_R;
-                }
-     void LinkNodes(){dl->ur=this;r->l=this;}
-     void kill(){dl->ur = nullptr; r->l = nullptr;erase();}
+    tight_UR_R() ;
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
     DCornerNode * dl;
     DVerticalSideNode *r;
 };
 
 class tight_UR_U:   public DNetworkListElement
 {public:
-    tight_UR_U(){                ax =2 ;
-                                ay = 12;
-                                 bx = 4;
-                                 by = 13;
-                                rot = m270;
-AppendFULL(0,2);AppendUL(1,1);AppendDR(0,1);AppendFULL(1,0);
-                         type = RailTypes::tight_UR_U;
-                }
-    void LinkNodes(){dl->ur=this;u->d=this;}
-    void kill(){dl->ur = nullptr; u->d = nullptr;erase();}
+    tight_UR_U();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
     DCornerNode * dl;
     DHorizontalSideNode *u;
 };
@@ -402,99 +362,62 @@ AppendFULL(0,2);AppendUL(1,1);AppendDR(0,1);AppendFULL(1,0);
 
 class tight_DR_D:  public  DNetworkListElement
 { public:
-        tight_DR_D(){         ax =2 ;
-                              ay = 12;
-                              bx = 4;
-                              by = 13;
-                              rot = d270;
-AppendFULL(0,0);AppendDL(1,1);AppendUR(0,1);AppendFULL(1,2);
-                  type = RailTypes::tight_DR_D;
-                    }
-         void LinkNodes(){ul->dr=this;d->u=this;}
-         void kill(){ul->dr = nullptr; d->u = nullptr;erase();}
-        DHorizontalSideNode *d;
-        DCornerNode* ul;
+    tight_DR_D();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
+    DHorizontalSideNode *d;
+    DCornerNode* ul;
 };
 
 class tight_DR_R:  public  DNetworkListElement
 { public:
-        tight_DR_R(){                      ax =2 ;
-                                            ay = 12;
-                                            bx = 4;
-                                            by = 13;
-                                           rot = m0;
-AppendFULL(0,0);AppendDL(1,0);AppendUR(1,1);AppendFULL(2,1);
-                               type = RailTypes::tight_DR_R;
-                    }
-          void LinkNodes(){ul->dr=this;r->l=this;}
-          void kill(){ul->dr = nullptr; r->l = nullptr;erase();}
-        DVerticalSideNode *r;
-        DCornerNode* ul;
+    tight_DR_R();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
+    DVerticalSideNode *r;
+    DCornerNode* ul;
 };
 
 
 class tight_DL_L:  public  DNetworkListElement
 { public:
-        tight_DL_L(){                   ax =2 ;
-                                         ay = 12;
-                                        bx = 4;
-                                        by = 13;
-                                       rot = d0;
-AppendFULL(0,1);AppendUL(1,1);AppendDR(1,0);AppendFULL(2,0);
-                            type = RailTypes::tight_DL_L;
-                    }
-        void LinkNodes(){ur->dl=this;l->r=this;}
-        void kill(){ur->dl = nullptr; l->r = nullptr;erase();}
-        DCornerNode *ur;
-        DVerticalSideNode *l;
+    tight_DL_L();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
+    DCornerNode *ur;
+    DVerticalSideNode *l;
 };
 
 class tight_DL_D:  public  DNetworkListElement
 { public:
-        tight_DL_D(){            ax =2 ;
-                                 ay = 12;
-                                 bx = 4;
-                                 by = 13;
-                                 rot = m90;
-AppendFULL(0,2);AppendDR(0,1);AppendUL(1,1);AppendFULL(1,0);
-                     type = RailTypes::tight_DL_D;
-                    }
-        void LinkNodes(){ur->dl=this;d->u=this;}
-        void kill(){ur->dl = nullptr; d->u = nullptr;erase();}
-        DCornerNode *ur;
-        DHorizontalSideNode *d;
+    tight_DL_D();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
+    DCornerNode *ur;
+    DHorizontalSideNode *d;
 };
 
 
 class tight_UL_U:   public DNetworkListElement
 { public:
-    tight_UL_U(){               ax =2 ;
-                                ay = 12;
-                                bx = 4;
-                                 by = 13;
-                                 rot = d90;
-AppendFULL(0,0);AppendUR(0,1);AppendDL(1,1);AppendFULL(1,2);
-                        type = RailTypes::tight_UL_U;
-                }
-     void LinkNodes(){dr->ul=this;u->d=this;}
-     void kill(){dr->ul = nullptr; u->d = nullptr;erase();}
+    tight_UL_U();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
     DCornerNode *dr;
     DHorizontalSideNode *u;
 };
 
 class tight_UL_L:  public DNetworkListElement
 { public:
-    tight_UL_L(){                    ax =2 ;
-                                     ay = 12;
-                                     bx = 4;
-                                     by = 13;
-                                     rot = m180;
-  AppendFULL(0,0);AppendDL(1,0);AppendUR(1,1);AppendFULL(2,1);
-                               type = RailTypes::tight_UL_L;
-
-                }
-    void LinkNodes(){dr->ul=this;l->r=this;}
-    void kill(){dr->ul = nullptr; l->r = nullptr;qDebug()<<"bye cruel world";erase();}
+    tight_UL_L();
+    void LinkNodes();
+    void LinkPaths();
+    void kill();
     DCornerNode *dr;
     DVerticalSideNode *l;
 };
@@ -504,47 +427,47 @@ class tight_UL_L:  public DNetworkListElement
 class junctionU_UL: public DNetworkListElement
 
 { public:
-        junctionU_UL(){         ax =2 ;
-                              ay = 14;
-                              bx = 4;
-                              by = 15;
-                              rot = d270;
-                    AppendFULL(0,0);AppendFULL(1,1);AppendUR(0,1);AppendFULL(1,2);
-                  type = RailTypes::junction_U_UL;
-                    }
-         void LinkNodes(){ul->dr=this; d->u=this; u->d=this;}
+    junctionU_UL(){         ax =2 ;
+                            ay = 14;
+                                            bx = 4;
+                                                            by = 15;
+                                                                            rot = d270;
+                                                                                            AppendFULL(0,0);AppendFULL(1,1);AppendUR(0,1);AppendFULL(1,2);
+                                                                                                            type = RailTypes::junction_U_UL;
+                      }
+    void LinkNodes(){ul->dr=this; d->u=this; u->d=this;}
 
-         void killUpgraded(){
+    void killUpgraded(){
 
-             if (ul->dr!=nullptr) ul->dr->kill();
-             if (d->u!=nullptr) d->u->kill();
-             if (u->d!=nullptr) u->d->kill();
+            if (ul->dr!=nullptr) ul->dr->kill();
+            if (d->u!=nullptr) d->u->kill();
+            if (u->d!=nullptr) u->d->kill();
 
-         }
+        }
 
-         void kill(){ul->dr = nullptr; d->u = nullptr; u->d=nullptr; erase();}
+    void kill(){ul->dr = nullptr; d->u = nullptr; u->d=nullptr; erase();}
 
 
-        DHorizontalSideNode *d;
-        DHorizontalSideNode *u;
-        DCornerNode *ul;
+    DHorizontalSideNode *d;
+    DHorizontalSideNode *u;
+    DCornerNode *ul;
 };
 
 class junctionU_UR: public DNetworkListElement
 {
-         public:
-        junctionU_UR(){         ax =2 ;
-                                ay = 14;
-                                bx = 4;
-                                by = 15;
-                                rot = m90;
-                      AppendFULL(1,0);AppendFULL(0,1);AppendUL(1,1);AppendFULL(0,2);
-                    type = RailTypes::junction_U_UR;
+public:
+    junctionU_UR(){         ax =2 ;
+                            ay = 14;
+                                            bx = 4;
+                                                            by = 15;
+                                                                            rot = m90;
+                                                                                            AppendFULL(1,0);AppendFULL(0,1);AppendUL(1,1);AppendFULL(0,2);
+                                                                                                            type = RailTypes::junction_U_UR;
                       }
 
-        void LinkNodes(){ur->dl=this; d->u=this; u->d=this;}
+    void LinkNodes(){ur->dl=this; d->u=this; u->d=this;}
 
-        void killUpgraded(){
+    void killUpgraded(){
 
             if (ur->dl!=nullptr) ur->dl->kill();
             if (d->u!=nullptr) d->u->kill();
@@ -552,11 +475,11 @@ class junctionU_UR: public DNetworkListElement
 
         }
 
-        void kill(){ur->dl = nullptr; d->u = nullptr; u->d=nullptr; erase();}
+    void kill(){ur->dl = nullptr; d->u = nullptr; u->d=nullptr; erase();}
 
-        DHorizontalSideNode *d;
-        DHorizontalSideNode *u;
-        DCornerNode *ur;
+    DHorizontalSideNode *d;
+    DHorizontalSideNode *u;
+    DCornerNode *ur;
 };
 
 class junctionUR_U: public DNetworkListElement
@@ -564,149 +487,149 @@ class junctionUR_U: public DNetworkListElement
 public:
     junctionUR_U()     {   ax = 2 ;
                            ay = 16;
-                           bx = 4;
-                           by = 17;
-                           rot = d90;
-                           AppendFULL(1,0);AppendFULL(1,1);AppendDR(0,1);AppendFULL(0,2);
-                         type = RailTypes::junction_UR_U;
-                       }
-                       void LinkNodes(){ dl->ur=this;ur->dl=this;u->d=this;}
-                       void kill(){ dl->ur=nullptr;ur->dl=nullptr;u->d=nullptr;erase();}
-                       void killUpgraded(){
+                                          bx = 4;
+                                                         by = 17;
+                                                                        rot = d90;
+                                                                                       AppendFULL(1,0);AppendFULL(1,1);AppendDR(0,1);AppendFULL(0,2);
+                                                                                                      type = RailTypes::junction_UR_U;
+                           }
+    void LinkNodes(){ dl->ur=this;ur->dl=this;u->d=this;}
+    void kill(){ dl->ur=nullptr;ur->dl=nullptr;u->d=nullptr;erase();}
+    void killUpgraded(){
 
-                           if (ur->dl!=nullptr) ur->dl->kill();
-                           if (dl->ur!=nullptr) dl->ur->kill();
-                           if (u->d!=nullptr) u->d->kill();
+            if (ur->dl!=nullptr) ur->dl->kill();
+            if (dl->ur!=nullptr) dl->ur->kill();
+            if (u->d!=nullptr) u->d->kill();
 
-                       }
-      DCornerNode *dl;
-      DCornerNode *ur;
-      DHorizontalSideNode *u;
+        }
+    DCornerNode *dl;
+    DCornerNode *ur;
+    DHorizontalSideNode *u;
 };
 
 class junctionUR_R: public DNetworkListElement
 {public:
     junctionUR_R()     {   ax = 2 ;
                            ay = 16;
-                           bx = 4;
-                           by = 17;
-                           rot = m0;
-                           AppendFULL(0,1);AppendFULL(1,0);AppendUL(1,1);AppendFULL(2,0);
-                         type = RailTypes::junction_UR_R;
-                       }
-                       void LinkNodes(){ dl->ur=this;ur->dl=this;r->l=this;}
-                       void kill(){ dl->ur=nullptr;ur->dl=nullptr;r->l=nullptr;erase();}
-                       void killUpgraded(){
+                                          bx = 4;
+                                                         by = 17;
+                                                                        rot = m0;
+                                                                                       AppendFULL(0,1);AppendFULL(1,0);AppendUL(1,1);AppendFULL(2,0);
+                                                                                                      type = RailTypes::junction_UR_R;
+                           }
+    void LinkNodes(){ dl->ur=this;ur->dl=this;r->l=this;}
+    void kill(){ dl->ur=nullptr;ur->dl=nullptr;r->l=nullptr;erase();}
+    void killUpgraded(){
 
-                           if (ur->dl!=nullptr) ur->dl->kill();
-                           if (dl->ur!=nullptr) dl->ur->kill();
-                           if (r->l!=nullptr) r->l->kill();
+            if (ur->dl!=nullptr) ur->dl->kill();
+            if (dl->ur!=nullptr) dl->ur->kill();
+            if (r->l!=nullptr) r->l->kill();
 
-                       }
+        }
 
-      DCornerNode *dl;
-      DCornerNode *ur;
-      DVerticalSideNode *r;
+    DCornerNode *dl;
+    DCornerNode *ur;
+    DVerticalSideNode *r;
 };
 
 class junctionR_UR: public DNetworkListElement
 {
-    public:
-        junctionR_UR()
+public:
+    junctionR_UR()
         {   ax = 2 ;
             ay = 14;
             bx = 4;
             by = 15;
             rot = d0;
-           AppendFULL(0,1);AppendFULL(1,1);AppendDR(1,0);AppendFULL(2,0);
-          type = RailTypes::junction_R_UR;
-        }
-        void LinkNodes(){ l->r=this;r->l=this;ur->dl=this;}
-        void kill(){ r->l=nullptr;l->r=nullptr;ur->dl=nullptr;erase();}
-        void killUpgraded(){
+            AppendFULL(0,1);AppendFULL(1,1);AppendDR(1,0);AppendFULL(2,0);
+            type = RailTypes::junction_R_UR;
+            }
+    void LinkNodes(){ l->r=this;r->l=this;ur->dl=this;}
+    void kill(){ r->l=nullptr;l->r=nullptr;ur->dl=nullptr;erase();}
+    void killUpgraded(){
 
             if (l->r!=nullptr) l->r->kill();
             if (r->l!=nullptr) r->l->kill();
             if (ur->dl!=nullptr) ur->dl->kill();
 
         }
-DVerticalSideNode *l;
-DVerticalSideNode *r;
-DCornerNode *ur;
+    DVerticalSideNode *l;
+    DVerticalSideNode *r;
+    DCornerNode *ur;
 };
 
 class junctionR_DR: public DNetworkListElement
 {
-       public:
-                junctionR_DR()
-                {   ax =2 ;
-                    ay = 14;
-                    bx = 4;
-                    by = 15;
-                    rot = m180;
-                    AppendFULL(0,0);AppendFULL(1,0);AppendUR(1,1);AppendFULL(2,1);
-                  type = RailTypes::junction_R_DR;
-                }
-                void LinkNodes(){ l->r=this;r->l=this;dr->ul=this;}
-                void kill(){ r->l=nullptr;l->r=nullptr;dr->ul=nullptr;erase();}
-                void killUpgraded(){
+public:
+    junctionR_DR()
+        {   ax =2 ;
+            ay = 14;
+            bx = 4;
+            by = 15;
+            rot = m180;
+            AppendFULL(0,0);AppendFULL(1,0);AppendUR(1,1);AppendFULL(2,1);
+            type = RailTypes::junction_R_DR;
+            }
+    void LinkNodes(){ l->r=this;r->l=this;dr->ul=this;}
+    void kill(){ r->l=nullptr;l->r=nullptr;dr->ul=nullptr;erase();}
+    void killUpgraded(){
 
-                    if (l->r!=nullptr) l->r->kill();
-                    if (r->l!=nullptr) r->l->kill();
-                    if (dr->ul!=nullptr) dr->ul->kill();
+            if (l->r!=nullptr) l->r->kill();
+            if (r->l!=nullptr) r->l->kill();
+            if (dr->ul!=nullptr) dr->ul->kill();
 
-                }
+        }
 
 
-DVerticalSideNode *l;
-DVerticalSideNode *r;
-DCornerNode *dr;
+    DVerticalSideNode *l;
+    DVerticalSideNode *r;
+    DCornerNode *dr;
 };
 
 class junctionDR_R: public DNetworkListElement
 { public:
-        junctionDR_R() {   ax = 2 ;
-                           ay = 16;
-                           bx = 4;
-                           by = 17;
-                           rot = d180;
-                           AppendFULL(0,0);AppendFULL(1,1);AppendDR(1,0);AppendFULL(2,1);
-                         type = RailTypes::junction_DR_D;
+    junctionDR_R() {   ax = 2 ;
+                       ay = 16;
+                                  bx = 4;
+                                             by = 17;
+                                                        rot = d180;
+                                                                   AppendFULL(0,0);AppendFULL(1,1);AppendDR(1,0);AppendFULL(2,1);
+                                                                              type = RailTypes::junction_DR_D;
                        }
-                       void LinkNodes(){ ul->dr=this;dr->ul=this;r->l=this;}
-                       void kill(){ ul->dr=nullptr;dr->ul=nullptr;r->l=nullptr;erase();}
-                       void killUpgraded(){
+    void LinkNodes(){ ul->dr=this;dr->ul=this;r->l=this;}
+    void kill(){ ul->dr=nullptr;dr->ul=nullptr;r->l=nullptr;erase();}
+    void killUpgraded(){
 
-                           if (ul->dr!=nullptr) ul->dr->kill();
-                           if (dr->ul!=nullptr) dr->ul->kill();
-                           if (r->l!=nullptr) r->l->kill();
+            if (ul->dr!=nullptr) ul->dr->kill();
+            if (dr->ul!=nullptr) dr->ul->kill();
+            if (r->l!=nullptr) r->l->kill();
 
-                       }
-        DCornerNode *ul;
-        DCornerNode *dr;
-        DVerticalSideNode *r;
+        }
+    DCornerNode *ul;
+    DCornerNode *dr;
+    DVerticalSideNode *r;
 };
 
 class junctionDR_D: public DNetworkListElement
 {
 public:
-        junctionDR_D() {   ax = 2 ;
-                           ay = 16;
-                           bx = 4;
-                           by = 17;
-                           rot = m90;
-                           AppendFULL(0,0);AppendFULL(1,1);AppendUR(0,1);AppendFULL(1,2);
-                         type = RailTypes::junction_DR_D;
+    junctionDR_D() {   ax = 2 ;
+                       ay = 16;
+                                  bx = 4;
+                                             by = 17;
+                                                        rot = m90;
+                                                                   AppendFULL(0,0);AppendFULL(1,1);AppendUR(0,1);AppendFULL(1,2);
+                                                                              type = RailTypes::junction_DR_D;
                        }
-                       void LinkNodes(){ ul->dr=this;dr->ul=this;d->u=this;}
-                       void kill(){ ul->dr=nullptr;dr->ul=nullptr;d->u=nullptr;erase();}
-                       void killUpgraded(){
+    void LinkNodes(){ ul->dr=this;dr->ul=this;d->u=this;}
+    void kill(){ ul->dr=nullptr;dr->ul=nullptr;d->u=nullptr;erase();}
+    void killUpgraded(){
 
-                           if (ul->dr!=nullptr) ul->dr->kill();
-                           if (dr->ul!=nullptr) dr->ul->kill();
-                           if (d->u!=nullptr) d->u->kill();
+            if (ul->dr!=nullptr) ul->dr->kill();
+            if (dr->ul!=nullptr) dr->ul->kill();
+            if (d->u!=nullptr) d->u->kill();
 
-                       }
+        }
     DCornerNode *ul;
     DCornerNode *dr;
     DHorizontalSideNode *d;
@@ -714,82 +637,82 @@ public:
 
 class junctionD_DL:public DNetworkListElement
 {
-    public:
-        junctionD_DL()
+public:
+    junctionD_DL()
         {
-                                        ax =2 ;
-                                       ay = 14;
-                                       bx = 4;
-                                       by = 15;
-                                       rot = m270;
-                                       AppendFULL(1,0);AppendFULL(1,1);AppendDR(0,1);AppendFULL(0,2);
-                                     type = RailTypes::junction_D_DL;
+            ax =2 ;
+            ay = 14;
+            bx = 4;
+            by = 15;
+            rot = m270;
+            AppendFULL(1,0);AppendFULL(1,1);AppendDR(0,1);AppendFULL(0,2);
+            type = RailTypes::junction_D_DL;
         }
-        void LinkNodes(){ u->d=this;d->u=this;dl->ur=this;}
-        void kill(){ u->d=nullptr;d->u=nullptr;dl->ur=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ u->d=this;d->u=this;dl->ur=this;}
+    void kill(){ u->d=nullptr;d->u=nullptr;dl->ur=nullptr;erase();}
+    void killUpgraded(){
 
             if (dl->ur!=nullptr) dl->ur->kill();
             if (d->u!=nullptr) d->u->kill();
             if (u->d!=nullptr) u->d->kill();
 
         }
-        DHorizontalSideNode *u;
-        DHorizontalSideNode *d;
-        DCornerNode * dl;
+    DHorizontalSideNode *u;
+    DHorizontalSideNode *d;
+    DCornerNode * dl;
 };
 
 class junctionD_DR:public DNetworkListElement
 {public:
-        junctionD_DR(){         ax =2 ;
-                              ay = 14;
-                              bx = 4;
-                              by = 15;
-                              rot = d90;
-                    AppendFULL(0,0);AppendFULL(0,1);AppendDL(1,1);AppendFULL(1,2);
-                  type = RailTypes::junction_D_DR;
-                    };
-         void LinkNodes(){dr->ul=this; d->u=this; u->d=this;}
+    junctionD_DR(){         ax =2 ;
+                            ay = 14;
+                                            bx = 4;
+                                                            by = 15;
+                                                                            rot = d90;
+                                                                                            AppendFULL(0,0);AppendFULL(0,1);AppendDL(1,1);AppendFULL(1,2);
+                                                                                                            type = RailTypes::junction_D_DR;
+                      };
+    void LinkNodes(){dr->ul=this; d->u=this; u->d=this;}
 
-         void killUpgraded(){
+    void killUpgraded(){
 
-             if (dr->ul!=nullptr) dr->ul->kill();
-             if (d->u!=nullptr) d->u->kill();
-             if (u->d!=nullptr) u->d->kill();
+            if (dr->ul!=nullptr) dr->ul->kill();
+            if (d->u!=nullptr) d->u->kill();
+            if (u->d!=nullptr) u->d->kill();
 
-         }
+        }
 
-         void kill(){dr->ul = nullptr; d->u = nullptr; u->d=nullptr; erase();}
+    void kill(){dr->ul = nullptr; d->u = nullptr; u->d=nullptr; erase();}
 
 
-        DHorizontalSideNode *u;
-        DHorizontalSideNode *d;
-        DCornerNode * dr;
+    DHorizontalSideNode *u;
+    DHorizontalSideNode *d;
+    DCornerNode * dr;
 };
 
 class junctionDL_D: public DNetworkListElement
 {
 public:
-        junctionDL_D() {   ax = 2 ;
-                           ay = 16;
-                           bx = 4;
-                           by = 17;
-                           rot = d270;
-                           AppendFULL(1,0);AppendFULL(0,1);AppendUL(1,1);AppendFULL(0,2);
-                         type = RailTypes::junction_DL_D;
+    junctionDL_D() {   ax = 2 ;
+                       ay = 16;
+                                  bx = 4;
+                                             by = 17;
+                                                        rot = d270;
+                                                                   AppendFULL(1,0);AppendFULL(0,1);AppendUL(1,1);AppendFULL(0,2);
+                                                                              type = RailTypes::junction_DL_D;
                        }
-                       void LinkNodes(){ ur->dl=this;dl->ur=this;d->u=this;}
-                       void kill(){ ur->dl=nullptr;dl->ur=nullptr;d->u=nullptr;erase();}
-                       void killUpgraded(){
+    void LinkNodes(){ ur->dl=this;dl->ur=this;d->u=this;}
+    void kill(){ ur->dl=nullptr;dl->ur=nullptr;d->u=nullptr;erase();}
+    void killUpgraded(){
 
-                           if (ur->dl!=nullptr) ur->dl->kill();
-                           if (dl->ur!=nullptr) dl->ur->kill();
-                           if (d->u!=nullptr) d->u->kill();
+            if (ur->dl!=nullptr) ur->dl->kill();
+            if (dl->ur!=nullptr) dl->ur->kill();
+            if (d->u!=nullptr) d->u->kill();
 
-                       }
-        DCornerNode *ur;
-        DCornerNode *dl;
-        DHorizontalSideNode *d;
+        }
+    DCornerNode *ur;
+    DCornerNode *dl;
+    DHorizontalSideNode *d;
 };
 
 class junctionDL_L: public DNetworkListElement
@@ -819,20 +742,20 @@ class junctionDL_L: public DNetworkListElement
 class junctionL_DL: public DNetworkListElement
 {
 public:
-        junctionL_DL()
-            {
-                ax = 2 ;
-                 ay = 14;
-                  bx = 4;
-                   by = 15;
-                 rot = d180;
-                  type = RailTypes::junction_L_DL;
- AppendFULL(0,1);AppendFULL(1,0);AppendUR(1,1);AppendFULL(2,0);
-            }
+    junctionL_DL()
+        {
+            ax = 2 ;
+            ay = 14;
+            bx = 4;
+            by = 15;
+            rot = d180;
+            type = RailTypes::junction_L_DL;
+            AppendFULL(0,1);AppendFULL(1,0);AppendUR(1,1);AppendFULL(2,0);
+        }
 
-        void LinkNodes(){ l->r=this;r->l=this;dl->ur=this;}
-        void kill(){ r->l=nullptr;l->r=nullptr;dl->ur=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ l->r=this;r->l=this;dl->ur=this;}
+    void kill(){ r->l=nullptr;l->r=nullptr;dl->ur=nullptr;erase();}
+    void killUpgraded(){
 
             if (l->r!=nullptr) l->r->kill();
             if (r->l!=nullptr) r->l->kill();
@@ -840,26 +763,26 @@ public:
 
         }
 
-        DVerticalSideNode *r;
-        DVerticalSideNode *l;
-        DCornerNode *dl;
+    DVerticalSideNode *r;
+    DVerticalSideNode *l;
+    DCornerNode *dl;
 };
 
 class junctionL_UL: public DNetworkListElement
 {
-    public:
-        junctionL_UL()
+public:
+    junctionL_UL()
         {   ax = 2 ;
             ay = 14;
             bx = 4;
             by = 15;
             rot = m0;
             AppendFULL(0,0);AppendFULL(1,1);AppendDL(1,0);AppendFULL(2,1);
-          type = RailTypes::junction_L_UL;
-        }
-        void LinkNodes(){ l->r=this;r->l=this;ul->dr=this;}
-        void kill(){ r->l=nullptr;l->r=nullptr;ul->dr=nullptr;erase();}
-        void killUpgraded(){
+            type = RailTypes::junction_L_UL;
+            }
+    void LinkNodes(){ l->r=this;r->l=this;ul->dr=this;}
+    void kill(){ r->l=nullptr;l->r=nullptr;ul->dr=nullptr;erase();}
+    void killUpgraded(){
 
             if (l->r!=nullptr) l->r->kill();
             if (r->l!=nullptr) r->l->kill();
@@ -867,32 +790,32 @@ class junctionL_UL: public DNetworkListElement
 
         }
 
-        DVerticalSideNode *r;
-        DVerticalSideNode *l;
-        DCornerNode *ul;
+    DVerticalSideNode *r;
+    DVerticalSideNode *l;
+    DCornerNode *ul;
 };
 
 class junctionUL_L: public DNetworkListElement
 {
 public:
     junctionUL_L()
-            {   ax = 2 ;
-                ay = 16;
-                bx = 4;
-                by = 17;
-                rot = d0;
-                AppendFULL(0,0);AppendFULL(1,0);AppendUR(1,1);AppendFULL(2,1);
-              type = RailTypes::junction_UL_L;
+        {   ax = 2 ;
+            ay = 16;
+            bx = 4;
+            by = 17;
+            rot = d0;
+            AppendFULL(0,0);AppendFULL(1,0);AppendUR(1,1);AppendFULL(2,1);
+            type = RailTypes::junction_UL_L;
             }
-            void LinkNodes(){ ul->dr=this;dr->ul=this;l->r=this;}
-            void kill(){ dr->ul=nullptr;ul->dr=nullptr;l->r=nullptr;erase();}
-            void killUpgraded(){
+    void LinkNodes(){ ul->dr=this;dr->ul=this;l->r=this;}
+    void kill(){ dr->ul=nullptr;ul->dr=nullptr;l->r=nullptr;erase();}
+    void killUpgraded(){
 
-                if (dr->ul!=nullptr) dr->ul->kill();
-                if (ul->dr!=nullptr) ul->dr->kill();
-                if (l->r!=nullptr) l->r->kill();
+            if (dr->ul!=nullptr) dr->ul->kill();
+            if (ul->dr!=nullptr) ul->dr->kill();
+            if (l->r!=nullptr) l->r->kill();
 
-            }
+        }
 
     DCornerNode *dr;
     DCornerNode *ul;
@@ -909,17 +832,17 @@ public:
             by = 17;
             rot = m270;
             AppendFULL(0,0);AppendFULL(0,1);AppendDL(1,1);AppendFULL(1,2);
-          type = RailTypes::junction_UL_U;
-        }
+            type = RailTypes::junction_UL_U;
+            }
     void LinkNodes(){ ul->dr=this;dr->ul=this;u->d=this;}
     void kill(){ dr->ul=nullptr;ul->dr=nullptr;u->d=nullptr;erase();}
     void killUpgraded(){
 
-        if (dr->ul!=nullptr) dr->ul->kill();
-        if (ul->dr!=nullptr) ul->dr->kill();
-        if (u->d!=nullptr) u->d->kill();
+            if (dr->ul!=nullptr) dr->ul->kill();
+            if (ul->dr!=nullptr) ul->dr->kill();
+            if (u->d!=nullptr) u->d->kill();
 
-    }
+        }
     DCornerNode *dr;
     DCornerNode *ul;
     DHorizontalSideNode *u;
@@ -928,8 +851,8 @@ public:
 // ====================== SPLITS =================
 class splitU_L: public DNetworkListElement
 {
-    public:
-        splitU_L() {
+public:
+    splitU_L() {
             ax = 0;
             ay = 14;
             bx=1;
@@ -942,9 +865,9 @@ class splitU_L: public DNetworkListElement
             type = RailTypes::split_U_L;
         }
 
-        void LinkNodes(){ u->d=this;d->u=this;ul->d=this;}
-        void kill(){ u->d=nullptr;d->u=nullptr;ul->d=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ u->d=this;d->u=this;ul->d=this;}
+    void kill(){ u->d=nullptr;d->u=nullptr;ul->d=nullptr;erase();}
+    void killUpgraded(){
 
             if (u->d!=nullptr) u->d->kill();
             if (d->u!=nullptr) d->u->kill();
@@ -954,16 +877,16 @@ class splitU_L: public DNetworkListElement
 
 
 
-        DHorizontalSideNode *d;
-        DHorizontalSideNode *u;
+    DHorizontalSideNode *d;
+    DHorizontalSideNode *u;
 
-        DHorizontalSideNode *ul;
+    DHorizontalSideNode *ul;
 };
 
 class splitU_R: public DNetworkListElement
 {
-    public:
-        splitU_R() {
+public:
+    splitU_R() {
             ax = 0;
             ay = 14;
             bx=1;
@@ -976,39 +899,39 @@ class splitU_R: public DNetworkListElement
             type = RailTypes::split_U_R;
         }
 
-        void LinkNodes(){ u->d=this;d->u=this;ur->d=this;}
-        void kill(){ u->d=nullptr;d->u=nullptr;ur->d=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ u->d=this;d->u=this;ur->d=this;}
+    void kill(){ u->d=nullptr;d->u=nullptr;ur->d=nullptr;erase();}
+    void killUpgraded(){
 
             if (u->d!=nullptr) u->d->kill();
             if (d->u!=nullptr) d->u->kill();
             if (ur->d!=nullptr) ur->d->kill();
         }
 
-        DHorizontalSideNode *d;
-        DHorizontalSideNode *u;
-        DHorizontalSideNode *ur;
+    DHorizontalSideNode *d;
+    DHorizontalSideNode *u;
+    DHorizontalSideNode *ur;
 };
 
 class splitUR_U: public DNetworkListElement
 {
 
-    public:
-        splitUR_U(){
-                      ax = 0;
-                      ay = 17;
-                      bx = 1;
-                      by = 19;
-                      rot = d0;
-                      AppendFULL(1,0);
-                      AppendDR(0,1);AppendFULL(1,1);
-                      AppendFULL(0,2);
-                       type = RailTypes::split_UR_U;
-                  }
+public:
+    splitUR_U(){
+            ax = 0;
+            ay = 17;
+            bx = 1;
+            by = 19;
+            rot = d0;
+            AppendFULL(1,0);
+            AppendDR(0,1);AppendFULL(1,1);
+            AppendFULL(0,2);
+            type = RailTypes::split_UR_U;
+        }
 
-        void LinkNodes(){ ur->dl=this;dl->ur=this;u->dl=this;}
-        void kill(){ ur->dl=nullptr;dl->ur=nullptr;u->dl=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ ur->dl=this;dl->ur=this;u->dl=this;}
+    void kill(){ ur->dl=nullptr;dl->ur=nullptr;u->dl=nullptr;erase();}
+    void killUpgraded(){
 
             if (ur->dl!=nullptr) ur->dl->kill();
             if (dl->ur!=nullptr) dl->ur->kill();
@@ -1017,29 +940,29 @@ class splitUR_U: public DNetworkListElement
 
 
 
-        DCornerNode *dl;
-        DCornerNode *ur;
-        DCornerNode *u;
+    DCornerNode *dl;
+    DCornerNode *ur;
+    DCornerNode *u;
 
 };
 
 class splitUR_R: public DNetworkListElement
 {
-    public:
-        splitUR_R(){
-                      ax = 0;
-                      ay = 17;
-                      bx = 1;
-                      by = 19;
-                      rot = m90;
-                      AppendFULL(0,1);
-                      AppendUL(1,1);AppendFULL(1,0);
-                      AppendFULL(2,0);
-                       type = RailTypes::split_UR_R;
-                  }
-        void LinkNodes(){ ur->dl=this;dl->ur=this;r->dl=this;}
-        void kill(){ ur->dl=nullptr;dl->ur=nullptr;r->dl=nullptr;erase();}
-        void killUpgraded(){
+public:
+    splitUR_R(){
+            ax = 0;
+            ay = 17;
+            bx = 1;
+            by = 19;
+            rot = m90;
+            AppendFULL(0,1);
+            AppendUL(1,1);AppendFULL(1,0);
+            AppendFULL(2,0);
+            type = RailTypes::split_UR_R;
+        }
+    void LinkNodes(){ ur->dl=this;dl->ur=this;r->dl=this;}
+    void kill(){ ur->dl=nullptr;dl->ur=nullptr;r->dl=nullptr;erase();}
+    void killUpgraded(){
 
             if (ur->dl!=nullptr) ur->dl->kill();
             if (dl->ur!=nullptr) dl->ur->kill();
@@ -1047,15 +970,15 @@ class splitUR_R: public DNetworkListElement
         }
 
 
-        DCornerNode *dl;
-        DCornerNode *ur;
-        DCornerNode *r;
+    DCornerNode *dl;
+    DCornerNode *ur;
+    DCornerNode *r;
 };
 
 
 class splitR_U: public DNetworkListElement
 {
-    public:  splitR_U() {
+public:  splitR_U() {
             ax = 0;
             ay = 14;
             bx=1;
@@ -1066,23 +989,23 @@ class splitR_U: public DNetworkListElement
             type = RailTypes::split_R_U;
         }
 
-        void LinkNodes(){ l->r=this;r->l=this;u->l=this;}
-        void kill(){ l->r=nullptr;r->l=nullptr;u->l=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ l->r=this;r->l=this;u->l=this;}
+    void kill(){ l->r=nullptr;r->l=nullptr;u->l=nullptr;erase();}
+    void killUpgraded(){
 
             if (l->r!=nullptr) l->r->kill();
             if (r->l!=nullptr) r->l->kill();
             if (u->l!=nullptr) u->l->kill();
         }
 
-        DVerticalSideNode * l;
-        DVerticalSideNode * r;
-        DVerticalSideNode * u;
+    DVerticalSideNode * l;
+    DVerticalSideNode * r;
+    DVerticalSideNode * u;
 };
 
 class splitR_D: public DNetworkListElement
 {
-    public:  splitR_D() {
+public:  splitR_D() {
             ax = 0;
             ay = 14;
             bx=1;
@@ -1093,83 +1016,83 @@ class splitR_D: public DNetworkListElement
             type = RailTypes::split_R_D;
         }
 
-        void LinkNodes(){ l->r=this;r->l=this;d->l=this;}
-        void kill(){ l->r=nullptr;r->l=nullptr;d->l=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ l->r=this;r->l=this;d->l=this;}
+    void kill(){ l->r=nullptr;r->l=nullptr;d->l=nullptr;erase();}
+    void killUpgraded(){
 
             if (l->r!=nullptr) l->r->kill();
             if (r->l!=nullptr) r->l->kill();
             if (d->l!=nullptr) d->l->kill();
         }
 
-        DVerticalSideNode * l;
-        DVerticalSideNode * r;
-        DVerticalSideNode * d;
+    DVerticalSideNode * l;
+    DVerticalSideNode * r;
+    DVerticalSideNode * d;
 };
 
 class splitDR_R: public DNetworkListElement
 {
-    public:
-        splitDR_R(){
-                      ax = 0;
-                      ay = 17;
-                      bx = 1;
-                      by = 19;
-                      rot = d90;
-                      AppendFULL(0,0);AppendDL(1,0);
-                      AppendFULL(1,1);
-                      AppendFULL(2,1);
-                       type = RailTypes::split_DR_R;
-                  }
+public:
+    splitDR_R(){
+            ax = 0;
+            ay = 17;
+            bx = 1;
+            by = 19;
+            rot = d90;
+            AppendFULL(0,0);AppendDL(1,0);
+            AppendFULL(1,1);
+            AppendFULL(2,1);
+            type = RailTypes::split_DR_R;
+        }
 
 
-        void LinkNodes(){ ul->dr=this;dr->ul=this;r->ul=this;}
-        void kill(){ ul->dr=nullptr;dr->ul=nullptr;r->ul=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ ul->dr=this;dr->ul=this;r->ul=this;}
+    void kill(){ ul->dr=nullptr;dr->ul=nullptr;r->ul=nullptr;erase();}
+    void killUpgraded(){
 
             if (ul->dr!=nullptr) ul->dr->kill();
             if (dr->ul!=nullptr) dr->ul->kill();
             if (r->ul!=nullptr) r->ul->kill();
         }
-        DCornerNode *ul;
-        DCornerNode *dr;
-        DCornerNode *r;
+    DCornerNode *ul;
+    DCornerNode *dr;
+    DCornerNode *r;
 };
 
 class splitDR_D: public DNetworkListElement
 {
-    public:
-        splitDR_D(){
-                      ax = 0;
-                      ay = 17;
-                      bx = 1;
-                      by = 19;
-                      rot = m180;
-                      AppendFULL(0,0);
-                      AppendUR(0,1);AppendFULL(1,1);
-                      AppendFULL(1,2);
-                       type = RailTypes::split_DR_D;
-                  }
+public:
+    splitDR_D(){
+            ax = 0;
+            ay = 17;
+            bx = 1;
+            by = 19;
+            rot = m180;
+            AppendFULL(0,0);
+            AppendUR(0,1);AppendFULL(1,1);
+            AppendFULL(1,2);
+            type = RailTypes::split_DR_D;
+        }
 
 
-        void LinkNodes(){ ul->dr=this;dr->ul=this;d->ul=this;}
-        void kill(){ ul->dr=nullptr;dr->ul=nullptr;d->ul=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ ul->dr=this;dr->ul=this;d->ul=this;}
+    void kill(){ ul->dr=nullptr;dr->ul=nullptr;d->ul=nullptr;erase();}
+    void killUpgraded(){
 
             if (ul->dr!=nullptr) ul->dr->kill();
             if (dr->ul!=nullptr) dr->ul->kill();
             if (d->ul!=nullptr) d->ul->kill();
         }
-        DCornerNode *ul;
-        DCornerNode *dr;
-        DCornerNode *d;
+    DCornerNode *ul;
+    DCornerNode *dr;
+    DCornerNode *d;
 };
 
 
 class splitD_R: public DNetworkListElement
 {
-    public:
-        splitD_R() {
+public:
+    splitD_R() {
             ax = 0;
             ay = 14;
             bx=1;
@@ -1177,29 +1100,29 @@ class splitD_R: public DNetworkListElement
             rot = d180;
             AppendFULL(0,0);AppendDL(1,0);
             AppendFULL(0,1);AppendFULL(1,1);
-           AppendFULL(1,2);
+            AppendFULL(1,2);
 
             type = RailTypes::split_D_R;
         }
 
-        void LinkNodes(){ u->d=this;d->u=this;dr->u=this;}
-        void kill(){ u->d=nullptr;d->u=nullptr;dr->u=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ u->d=this;d->u=this;dr->u=this;}
+    void kill(){ u->d=nullptr;d->u=nullptr;dr->u=nullptr;erase();}
+    void killUpgraded(){
             if (u->d!=nullptr) u->d->kill();
             if (d->u!=nullptr) d->u->kill();
             if (dr->u!=nullptr) dr->u->kill();
         }
 
 
-        DHorizontalSideNode *d;
-        DHorizontalSideNode *u;
-        DHorizontalSideNode *dr;
+    DHorizontalSideNode *d;
+    DHorizontalSideNode *u;
+    DHorizontalSideNode *dr;
 };
 
 class splitD_L: public DNetworkListElement
 {
-    public:
-        splitD_L() {
+public:
+    splitD_L() {
             ax = 0;
             ay = 14;
             bx=1;
@@ -1212,40 +1135,40 @@ class splitD_L: public DNetworkListElement
             type = RailTypes::split_D_L;
         }
 
-        void LinkNodes(){ u->d=this;d->u=this;dl->u=this;}
-        void kill(){ u->d=nullptr;d->u=nullptr;dl->u=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ u->d=this;d->u=this;dl->u=this;}
+    void kill(){ u->d=nullptr;d->u=nullptr;dl->u=nullptr;erase();}
+    void killUpgraded(){
 
             if (u->d!=nullptr) u->d->kill();
             if (d->u!=nullptr) d->u->kill();
             if (dl->u!=nullptr) dl->u->kill();
         }
 
-        DHorizontalSideNode *d;
-        DHorizontalSideNode *u;
-        DHorizontalSideNode *dl;
+    DHorizontalSideNode *d;
+    DHorizontalSideNode *u;
+    DHorizontalSideNode *dl;
 };
 
 
 class splitDL_D: public DNetworkListElement
 {
 
-    public:
-        splitDL_D(){
-                      ax = 0;
-                      ay = 17;
-                      bx = 1;
-                      by = 19;
-                      rot = d180;
-                      AppendFULL(1,0);
-                      AppendUL(1,1);AppendFULL(0,1);
-                      AppendFULL(0,2);
-                       type = RailTypes::split_DL_D;
-                  }
+public:
+    splitDL_D(){
+            ax = 0;
+            ay = 17;
+            bx = 1;
+            by = 19;
+            rot = d180;
+            AppendFULL(1,0);
+            AppendUL(1,1);AppendFULL(0,1);
+            AppendFULL(0,2);
+            type = RailTypes::split_DL_D;
+        }
 
-        void LinkNodes(){ ur->dl=this;dl->ur=this;d->ur=this;}
-        void kill(){ ur->dl=nullptr;dl->ur=nullptr;d->ur=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ ur->dl=this;dl->ur=this;d->ur=this;}
+    void kill(){ ur->dl=nullptr;dl->ur=nullptr;d->ur=nullptr;erase();}
+    void killUpgraded(){
 
             if (ur->dl!=nullptr) ur->dl->kill();
             if (dl->ur!=nullptr) dl->ur->kill();
@@ -1254,29 +1177,29 @@ class splitDL_D: public DNetworkListElement
 
 
 
-        DCornerNode *dl;
-        DCornerNode *ur;
-        DCornerNode *d;
+    DCornerNode *dl;
+    DCornerNode *ur;
+    DCornerNode *d;
 
 };
 
 class splitDL_L: public DNetworkListElement
 {
-    public:
-        splitDL_L(){
-                      ax = 0;
-                      ay = 17;
-                      bx = 1;
-                      by = 19;
-                      rot = m270;
-                      AppendFULL(0,1);
-                      AppendDR(1,0);AppendFULL(1,1);
-                      AppendFULL(2,0);
-                       type = RailTypes::split_DL_L;
-                  }
-        void LinkNodes(){ ur->dl=this;dl->ur=this;l->ur=this;}
-        void kill(){ ur->dl=nullptr;dl->ur=nullptr;l->ur=nullptr;erase();}
-        void killUpgraded(){
+public:
+    splitDL_L(){
+            ax = 0;
+            ay = 17;
+            bx = 1;
+            by = 19;
+            rot = m270;
+            AppendFULL(0,1);
+            AppendDR(1,0);AppendFULL(1,1);
+            AppendFULL(2,0);
+            type = RailTypes::split_DL_L;
+        }
+    void LinkNodes(){ ur->dl=this;dl->ur=this;l->ur=this;}
+    void kill(){ ur->dl=nullptr;dl->ur=nullptr;l->ur=nullptr;erase();}
+    void killUpgraded(){
 
             if (ur->dl!=nullptr) ur->dl->kill();
             if (dl->ur!=nullptr) dl->ur->kill();
@@ -1284,15 +1207,15 @@ class splitDL_L: public DNetworkListElement
         }
 
 
-        DCornerNode *dl;
-        DCornerNode *ur;
-        DCornerNode *l;
+    DCornerNode *dl;
+    DCornerNode *ur;
+    DCornerNode *l;
 };
 
 
 class splitL_D: public DNetworkListElement
 {
-    public:  splitL_D() {
+public:  splitL_D() {
             ax = 0;
             ay = 14;
             bx=1;
@@ -1303,23 +1226,23 @@ class splitL_D: public DNetworkListElement
             type = RailTypes::split_L_D;
         }
 
-        void LinkNodes(){ l->r=this;r->l=this;d->r=this;}
-        void kill(){ l->r=nullptr;r->l=nullptr;d->r=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ l->r=this;r->l=this;d->r=this;}
+    void kill(){ l->r=nullptr;r->l=nullptr;d->r=nullptr;erase();}
+    void killUpgraded(){
 
             if (l->r!=nullptr) l->r->kill();
             if (r->l!=nullptr) r->l->kill();
             if (d->r!=nullptr) d->r->kill();
         }
 
-        DVerticalSideNode * l;
-        DVerticalSideNode * r;
-        DVerticalSideNode * d;
+    DVerticalSideNode * l;
+    DVerticalSideNode * r;
+    DVerticalSideNode * d;
 };
 
 class splitL_U: public DNetworkListElement
 {
-    public:  splitL_U() {
+public:  splitL_U() {
             ax = 0;
             ay = 14;
             bx=1;
@@ -1330,77 +1253,77 @@ class splitL_U: public DNetworkListElement
             type = RailTypes::split_L_U;
         }
 
-        void LinkNodes(){ l->r=this;r->l=this;u->r=this;}
-        void kill(){ l->r=nullptr;r->l=nullptr;u->r=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ l->r=this;r->l=this;u->r=this;}
+    void kill(){ l->r=nullptr;r->l=nullptr;u->r=nullptr;erase();}
+    void killUpgraded(){
 
             if (l->r!=nullptr) l->r->kill();
             if (r->l!=nullptr) r->l->kill();
             if (u->r!=nullptr) u->r->kill();
         }
 
-        DVerticalSideNode * l;
-        DVerticalSideNode * r;
-        DVerticalSideNode * u;
+    DVerticalSideNode * l;
+    DVerticalSideNode * r;
+    DVerticalSideNode * u;
 };
 
 
 class splitUL_L: public DNetworkListElement
 {
-    public:
-        splitUL_L(){
-                      ax = 0;
-                      ay = 17;
-                      bx = 1;
-                      by = 19;
-                      rot = d270;
-                      AppendFULL(0,0);AppendFULL(1,0);
-                      AppendUR(1,1);AppendFULL(2,1);
+public:
+    splitUL_L(){
+            ax = 0;
+            ay = 17;
+            bx = 1;
+            by = 19;
+            rot = d270;
+            AppendFULL(0,0);AppendFULL(1,0);
+            AppendUR(1,1);AppendFULL(2,1);
 
-                       type = RailTypes::split_UL_L;
-                  }
+            type = RailTypes::split_UL_L;
+        }
 
 
-        void LinkNodes(){ ul->dr=this;dr->ul=this;l->dr=this;}
-        void kill(){ ul->dr=nullptr;dr->ul=nullptr;l->dr=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ ul->dr=this;dr->ul=this;l->dr=this;}
+    void kill(){ ul->dr=nullptr;dr->ul=nullptr;l->dr=nullptr;erase();}
+    void killUpgraded(){
 
             if (ul->dr!=nullptr) ul->dr->kill();
             if (dr->ul!=nullptr) dr->ul->kill();
             if (l->dr!=nullptr) l->dr->kill();
         }
-        DCornerNode *ul;
-        DCornerNode *dr;
-        DCornerNode *l;
+    DCornerNode *ul;
+    DCornerNode *dr;
+    DCornerNode *l;
 };
 
 class splitUL_U: public DNetworkListElement
 {
-    public:
-        splitUL_U(){
-                      ax = 0;
-                      ay = 17;
-                      bx = 1;
-                      by = 19;
-                      rot = m0;
-                      AppendFULL(0,0);AppendDL(1,1);
-                      AppendFULL(0,1);
-                      AppendFULL(1,2);
-                       type = RailTypes::split_UL_U;
-                  }
+public:
+    splitUL_U(){
+            ax = 0;
+            ay = 17;
+            bx = 1;
+            by = 19;
+            rot = m0;
+            AppendFULL(0,0);AppendDL(1,1);
+            AppendFULL(0,1);
+            AppendFULL(1,2);
+            type = RailTypes::split_UL_U;
+        }
 
 
-        void LinkNodes(){ ul->dr=this;dr->ul=this;u->dr=this;}
-        void kill(){ ul->dr=nullptr;dr->ul=nullptr;u->dr=nullptr;erase();}
-        void killUpgraded(){
+    void LinkNodes(){ ul->dr=this;dr->ul=this;u->dr=this;}
+    void kill(){ ul->dr=nullptr;dr->ul=nullptr;u->dr=nullptr;erase();}
+    void killUpgraded(){
 
             if (ul->dr!=nullptr) ul->dr->kill();
             if (dr->ul!=nullptr) dr->ul->kill();
             if (u->dr!=nullptr) u->dr->kill();
         }
-        DCornerNode *ul;
-        DCornerNode *dr;
-        DCornerNode *u;
+    DCornerNode *ul;
+    DCornerNode *dr;
+    DCornerNode *u;
 };
 
 
@@ -1408,32 +1331,32 @@ class splitUL_U: public DNetworkListElement
 
 class NjunctionU: public DNetworkListElement
 {
-    public:
-        NjunctionU() {
-               ax = 2;
-               ay = 20;
-               bx = 3;
-               by = 22;
-               rot = d0;
-                AppendFULL(0,0);AppendFULL(1,0);
-                AppendFULL(0,1);AppendFULL(1,1);
-                AppendFULL(0,2);AppendFULL(1,2);
+public:
+    NjunctionU() {
+            ax = 2;
+            ay = 20;
+            bx = 3;
+            by = 22;
+            rot = d0;
+            AppendFULL(0,0);AppendFULL(1,0);
+            AppendFULL(0,1);AppendFULL(1,1);
+            AppendFULL(0,2);AppendFULL(1,2);
             type = RailTypes::Njunction_U;
 
         }
 
-        void LinkNodes(){
+    void LinkNodes(){
             dl->u = this; dr->u = this;
             ul->d = this; ur->d = this;
         }
 
-        void kill(){
+    void kill(){
             dl->u = nullptr; dr->u = nullptr;
             ul->d = nullptr; ur->d = nullptr;
             erase();
         }
 
-        void killUpgraded(){
+    void killUpgraded(){
 
             if (ul->d!=nullptr) ul->d->kill();
             if (ur->d!=nullptr) ur->d->kill();
@@ -1446,45 +1369,45 @@ class NjunctionU: public DNetworkListElement
 
         }
 
-        DHorizontalSideNode *dl;
-        DHorizontalSideNode *dr;
+    DHorizontalSideNode *dl;
+    DHorizontalSideNode *dr;
 
-        DHorizontalSideNode *ul;
-        DHorizontalSideNode *ur;
+    DHorizontalSideNode *ul;
+    DHorizontalSideNode *ur;
 
-        DHorizontalSideNode *mid_u_l;
-        DHorizontalSideNode *mid_u_r;
+    DHorizontalSideNode *mid_u_l;
+    DHorizontalSideNode *mid_u_r;
 
-        DHorizontalSideNode (*array)[0][0];
+    DHorizontalSideNode (*array)[0][0];
 };
 
 class NjunctionD: public DNetworkListElement
 {
-    public:
-        NjunctionD() {
-               ax = 2;
-               ay = 20;
-               bx = 3;
-               by = 22;
-               rot = m0;
-                 AppendFULL(0,0);AppendFULL(1,0);
-                AppendFULL(0,1);AppendFULL(1,1);
-                AppendFULL(0,2);AppendFULL(1,2);
+public:
+    NjunctionD() {
+            ax = 2;
+            ay = 20;
+            bx = 3;
+            by = 22;
+            rot = m0;
+            AppendFULL(0,0);AppendFULL(1,0);
+            AppendFULL(0,1);AppendFULL(1,1);
+            AppendFULL(0,2);AppendFULL(1,2);
             type = RailTypes::Njunction_D;
         }
 
-        void LinkNodes(){
+    void LinkNodes(){
             dl->u = this; dr->u = this;
             ul->d = this; ur->d = this;
         }
 
-        void kill(){
+    void kill(){
             dl->u = nullptr; dr->u = nullptr;
             ul->d = nullptr; ur->d = nullptr;
             erase();
         }
 
-        void killUpgraded(){
+    void killUpgraded(){
 
             if (ul->d!=nullptr) ul->d->kill();
             if (ur->d!=nullptr) ur->d->kill();
@@ -1496,45 +1419,45 @@ class NjunctionD: public DNetworkListElement
 
         }
 
-        DHorizontalSideNode *dl;
-        DHorizontalSideNode *dr;
+    DHorizontalSideNode *dl;
+    DHorizontalSideNode *dr;
 
-        DHorizontalSideNode *ul;
-        DHorizontalSideNode *ur;
+    DHorizontalSideNode *ul;
+    DHorizontalSideNode *ur;
 
 
-        DHorizontalSideNode *mid_u_l;
-        DHorizontalSideNode *mid_u_r;
+    DHorizontalSideNode *mid_u_l;
+    DHorizontalSideNode *mid_u_r;
 
 };
 
 
 class NjunctionR: public DNetworkListElement
 {
-    public:
-        NjunctionR() {
-               ax = 2;
-               ay = 20;
-               bx = 3;
-               by = 22;
-               rot = d90;
-                AppendFULL(0,0);AppendFULL(1,0);AppendFULL(2,0);
-                AppendFULL(0,1);AppendFULL(1,1);AppendFULL(2,1);
+public:
+    NjunctionR() {
+            ax = 2;
+            ay = 20;
+            bx = 3;
+            by = 22;
+            rot = d90;
+            AppendFULL(0,0);AppendFULL(1,0);AppendFULL(2,0);
+            AppendFULL(0,1);AppendFULL(1,1);AppendFULL(2,1);
             type = RailTypes::Njunction_R;
         }
 
-        void LinkNodes(){
+    void LinkNodes(){
             lu->r = this; ld->r = this;
             ru->l = this; rd->l = this;
         }
 
-        void kill(){
+    void kill(){
             lu->r = nullptr; ld->r = nullptr;
             ru->l = nullptr; rd->l = nullptr;
             erase();
         }
 
-        void killUpgraded(){
+    void killUpgraded(){
             if (lu->r!=nullptr) lu->r->kill();
             if (ld->r!=nullptr) ld->r->kill();
             if (ru->l!=nullptr) ru->l->kill();
@@ -1544,42 +1467,42 @@ class NjunctionR: public DNetworkListElement
             if (mid_r_d->l!=nullptr) mid_r_d->l->kill();
         }
 
-        DVerticalSideNode *lu;
-        DVerticalSideNode *ld;
+    DVerticalSideNode *lu;
+    DVerticalSideNode *ld;
 
-        DVerticalSideNode *ru;
-        DVerticalSideNode *rd;
+    DVerticalSideNode *ru;
+    DVerticalSideNode *rd;
 
-        DVerticalSideNode *mid_r_u;
-        DVerticalSideNode *mid_r_d;
+    DVerticalSideNode *mid_r_u;
+    DVerticalSideNode *mid_r_d;
 };
 
 class NjunctionL: public DNetworkListElement
 {
-    public:
-        NjunctionL() {
-               ax = 2;
-               ay = 20;
-               bx = 3;
-               by = 22;
-               rot = m90;
-                AppendFULL(0,0);AppendFULL(1,0);AppendFULL(2,0);
-                AppendFULL(0,1);AppendFULL(1,1);AppendFULL(2,1);
+public:
+    NjunctionL() {
+            ax = 2;
+            ay = 20;
+            bx = 3;
+            by = 22;
+            rot = m90;
+            AppendFULL(0,0);AppendFULL(1,0);AppendFULL(2,0);
+            AppendFULL(0,1);AppendFULL(1,1);AppendFULL(2,1);
             type = RailTypes::Njunction_R;
         }
 
-        void LinkNodes(){
+    void LinkNodes(){
             lu->r = this; ld->r = this;
             ru->l = this; rd->l = this;
         }
 
-        void kill(){
+    void kill(){
             lu->r = nullptr; ld->r = nullptr;
             ru->l = nullptr; rd->l = nullptr;
             erase();
         }
 
-        void killUpgraded(){
+    void killUpgraded(){
             if (lu->r!=nullptr) lu->r->kill();
             if (ld->r!=nullptr) ld->r->kill();
             if (ru->l!=nullptr) ru->l->kill();
@@ -1589,182 +1512,182 @@ class NjunctionL: public DNetworkListElement
             if (mid_r_d->l!=nullptr) mid_r_d->l->kill();
         }
 
-        DVerticalSideNode *lu;
-        DVerticalSideNode *ld;
+    DVerticalSideNode *lu;
+    DVerticalSideNode *ld;
 
-        DVerticalSideNode *ru;
-        DVerticalSideNode *rd;
+    DVerticalSideNode *ru;
+    DVerticalSideNode *rd;
 
-        DVerticalSideNode *mid_r_u;
-        DVerticalSideNode *mid_r_d;
+    DVerticalSideNode *mid_r_u;
+    DVerticalSideNode *mid_r_d;
 };
 
 
 class NjunctionUR: public DNetworkListElement
 {
-    public:
-        NjunctionUR() {
-               ax = 4;
-               ay = 20;
-               bx = 5;
-               by = 22;
-               rot = d0;
-                                AppendFULL(1,0);
-                AppendFULL(0,1);AppendFULL(1,1);
-                AppendFULL(0,2);
+public:
+    NjunctionUR() {
+            ax = 4;
+            ay = 20;
+            bx = 5;
+            by = 22;
+            rot = d0;
+            AppendFULL(1,0);
+            AppendFULL(0,1);AppendFULL(1,1);
+            AppendFULL(0,2);
             type = RailTypes::Njunction_UR;
         }
 
-        void LinkNodes(){
+    void LinkNodes(){
             dlu->ur = this; uru->dl = this;
             dld->ur = this; urd->dl = this;
         }
 
-        void kill(){
+    void kill(){
             dlu->ur = nullptr; uru->dl = nullptr;
             dld->ur = nullptr; urd->dl = nullptr;
             erase();
         }
 
-        void killUpgraded(){
+    void killUpgraded(){
             if (dlu->ur!=nullptr) dlu->ur->kill();
             if (dld->ur!=nullptr) dld->ur->kill();
             if (uru->dl!=nullptr) uru->dl->kill();
             if (urd->dl!=nullptr) urd->dl->kill();
         }
 
-        DCornerNode *dlu;
-        DCornerNode *dld;
+    DCornerNode *dlu;
+    DCornerNode *dld;
 
-        DCornerNode *uru;
-        DCornerNode *urd;
+    DCornerNode *uru;
+    DCornerNode *urd;
 
 };
 
 
 class NjunctionDR: public DNetworkListElement
 {
-    public:
-        NjunctionDR() {
-               ax = 4;
-               ay = 20;
-               bx = 5;
-               by = 22;
-               rot = d90;
-                AppendFULL(0,0);AppendFULL(1,0);
-                                AppendFULL(1,1);AppendFULL(2,1);
+public:
+    NjunctionDR() {
+            ax = 4;
+            ay = 20;
+            bx = 5;
+            by = 22;
+            rot = d90;
+            AppendFULL(0,0);AppendFULL(1,0);
+            AppendFULL(1,1);AppendFULL(2,1);
 
             type = RailTypes::Njunction_DR;
         }
 
-        void LinkNodes(){
+    void LinkNodes(){
             ull->dr = this; drl->ul = this;
             ulr->dr = this; drr->ul = this;
         }
 
-        void kill(){
+    void kill(){
             ull->dr = nullptr; drl->ul = nullptr;
             ulr->dr = nullptr; drr->ul = nullptr;
             erase();
         }
 
-        void killUpgraded(){
+    void killUpgraded(){
             if (ull->dr!=nullptr) ull->dr->kill();
             if (ulr->dr!=nullptr) ulr->dr->kill();
             if (drl->ul!=nullptr) drl->ul->kill();
             if (drr->ul!=nullptr) drr->ul->kill();
         }
 
-        DCornerNode *ull;
-        DCornerNode *ulr;
+    DCornerNode *ull;
+    DCornerNode *ulr;
 
-        DCornerNode *drl;
-        DCornerNode *drr;
+    DCornerNode *drl;
+    DCornerNode *drr;
 
 };
 
 
 class NjunctionUL: public DNetworkListElement
 {
-    public:
-        NjunctionUL() {
-               ax = 4;
-               ay = 20;
-               bx = 5;
-               by = 22;
-               rot = m0;
-                AppendFULL(0,0);
-                AppendFULL(0,1);AppendFULL(1,1);
-                                AppendFULL(1,2);
+public:
+    NjunctionUL() {
+            ax = 4;
+            ay = 20;
+            bx = 5;
+            by = 22;
+            rot = m0;
+            AppendFULL(0,0);
+            AppendFULL(0,1);AppendFULL(1,1);
+            AppendFULL(1,2);
 
             type = RailTypes::Njunction_UL;
         }
 
-        void LinkNodes(){
+    void LinkNodes(){
             ulu->dr = this; dru->ul = this;
             uld->dr = this; drd->ul = this;
         }
 
-        void kill(){
+    void kill(){
             ulu->dr = nullptr; dru->ul = nullptr;
             uld->dr = nullptr; drd->ul = nullptr;
             erase();
         }
 
-        void killUpgraded(){
+    void killUpgraded(){
             if (ulu->dr!=nullptr) ulu->dr->kill();
             if (uld->dr!=nullptr) uld->dr->kill();
             if (drd->ul!=nullptr) drd->ul->kill();
             if (dru->ul!=nullptr) dru->ul->kill();
         }
 
-        DCornerNode *ulu;
-        DCornerNode *uld;
+    DCornerNode *ulu;
+    DCornerNode *uld;
 
-        DCornerNode *dru;
-        DCornerNode *drd;
+    DCornerNode *dru;
+    DCornerNode *drd;
 
 };
 
 class NjunctionDL: public DNetworkListElement
 {
-    public:
-        NjunctionDL() {
-               ax = 4;
-               ay = 20;
-               bx = 5;
-               by = 22;
-               rot = m90;
-                AppendFULL(1,0);AppendFULL(2,0);
-                AppendFULL(0,1);AppendFULL(1,1);
+public:
+    NjunctionDL() {
+            ax = 4;
+            ay = 20;
+            bx = 5;
+            by = 22;
+            rot = m90;
+            AppendFULL(1,0);AppendFULL(2,0);
+            AppendFULL(0,1);AppendFULL(1,1);
 
 
             type = RailTypes::Njunction_DL;
         }
 
-        void LinkNodes(){
+    void LinkNodes(){
             dll->ur = this; url->dl = this;
             dlr->ur = this; urr->dl = this;
         }
 
-        void kill(){
+    void kill(){
             dll->ur = nullptr; url->dl = nullptr;
             dlr->ur = nullptr; urr->dl = nullptr;
             erase();
         }
 
-        void killUpgraded(){
+    void killUpgraded(){
             if (dll->ur!=nullptr) dll->ur->kill();
             if (dlr->ur!=nullptr) dlr->ur->kill();
             if (url->dl!=nullptr) url->dl->kill();
             if (urr->dl!=nullptr) urr->dl->kill();
         }
 
-        DCornerNode *dll;
-        DCornerNode *dlr;
+    DCornerNode *dll;
+    DCornerNode *dlr;
 
-        DCornerNode *url;
-        DCornerNode *urr;
+    DCornerNode *url;
+    DCornerNode *urr;
 };
 
 /*
@@ -1951,71 +1874,71 @@ class TwoTrackJunctionUR_R: public DNetworkListElement
 // =============== straights ==================
 class RoadVert:public DNetworkListElement
 {
-        public:
-        RoadVert() {     ax = 5;
-                             ay = 14;
-                             bx = 5;
-                             by = 14;
-                             rot = d0;
-                            AppendFULL(0,0);
-                             type = RailTypes::RoadVert;
-                       }
-        void LinkNodes(){u->d=this;d->u=this;}
-        void kill(){u->d = nullptr; d->u = nullptr;erase();}
+public:
+    RoadVert() {     ax = 5;
+                     ay = 14;
+                              bx = 5;
+                                       by = 14;
+                                                rot = d0;
+                                                         AppendFULL(0,0);
+                                                                  type = RailTypes::RoadVert;
+                   }
+    void LinkNodes(){u->d=this;d->u=this;}
+    void kill(){u->d = nullptr; d->u = nullptr;erase();}
     DHorizontalSideNode * u;
     DHorizontalSideNode * d;
 };
 
 class RoadHoriz:public DNetworkListElement
 {
-        public:
-        RoadHoriz() {           ax = 5;
-                                    ay = 14;
-                                   bx = 5;
-                                   by = 14;
-                                    rot = d90;
-                                   AppendFULL(0,0);
-                               type = RailTypes::RoadHoriz;
-                        }
-        void LinkNodes(){l->r=this;r->l=this;}
-        void kill(){l->r = nullptr; r->l = nullptr;erase();}
-        DVerticalSideNode *l;
-        DVerticalSideNode *r;
+public:
+    RoadHoriz() {           ax = 5;
+                            ay = 14;
+                                            bx = 5;
+                                                            by = 14;
+                                                                            rot = d90;
+                                                                                            AppendFULL(0,0);
+                                                                                                            type = RailTypes::RoadHoriz;
+                    }
+    void LinkNodes(){l->r=this;r->l=this;}
+    void kill(){l->r = nullptr; r->l = nullptr;erase();}
+    DVerticalSideNode *l;
+    DVerticalSideNode *r;
 };
 
 
 // ================ diags =======================
 class RoadULDR: public DNetworkListElement
 {
-    public:
-        RoadULDR(){        ax =8 ;
-                            ay = 14;
-                           bx = 8;
-                            by = 14;
-                            rot = m0;
+public:
+    RoadULDR(){        ax =8 ;
+                       ay = 14;
+                                  bx = 8;
+                                             by = 14;
+                                                        rot = m0;
 
-                            AppendFULL(0,0);
-                             type = RailTypes::RoadULDR;
+                                                                   AppendFULL(0,0);
+                                                                              type = RailTypes::RoadULDR;
                   }
-        void LinkNodes(){ul->dr=this;dr->ul=this;}
-        void kill(){ul->dr = nullptr; dr->ul = nullptr;erase();}
+    void LinkNodes(){ul->dr=this;dr->ul=this;}
+    void kill(){ul->dr = nullptr; dr->ul = nullptr;erase();}
     DCornerNode * ul;
     DCornerNode * dr;
 };
 
 class RoadURDL:public DNetworkListElement
 {
-        public:
-        RoadURDL(){        ax = 8 ;
-                           ay = 14;
-                           bx = 8;
-                           by = 14;
-                           rot = d0;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadURDL;
+public:
+    RoadURDL(){        ax = 8 ;
+                       ay = 14;
+                                  bx = 8;
+                                             by = 14;
+                                                        rot = d0;
+                                                                   AppendFULL(0,0);
+                                                                              type = RailTypes::RoadURDL;
                   }
-        void LinkNodes(){ur->dl=this;dl->ur=this;}
-        void kill(){ur->dl = nullptr; dl->ur = nullptr;erase();}
+    void LinkNodes(){ur->dl=this;dl->ur=this;}
+    void kill(){ur->dl = nullptr; dl->ur = nullptr;erase();}
     DCornerNode * ur;
     DCornerNode * dl;
 };
@@ -2025,72 +1948,72 @@ class RoadURDL:public DNetworkListElement
 
 class RoadTurnUR:public DNetworkListElement
 {
-        public:
-        RoadTurnUR(){        ax =5 ;
-                           ay = 15;
-                           bx = 5;
-                           by = 15;
-                           rot = d0;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTurnUR;
-                  }
-        void LinkNodes(){u->d =this;r->l=this;}
-        void kill(){u->d = nullptr; r->l = nullptr;erase();}
+public:
+    RoadTurnUR(){        ax =5 ;
+                         ay = 15;
+                                      bx = 5;
+                                                   by = 15;
+                                                                rot = d0;
+                                                                             AppendFULL(0,0);
+                                                                                          type = RailTypes::RoadTurnUR;
+                    }
+    void LinkNodes(){u->d =this;r->l=this;}
+    void kill(){u->d = nullptr; r->l = nullptr;erase();}
 
-        DHorizontalSideNode * u;
-        DVerticalSideNode * r;
+    DHorizontalSideNode * u;
+    DVerticalSideNode * r;
 
 };
 
 class RoadTurnDR:public DNetworkListElement
 {
-        public:
-        RoadTurnDR(){        ax =5 ;
-                           ay = 15;
-                           bx = 5;
-                           by = 15;
-                           rot = d90;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTurnDR;
-                  }
-        void LinkNodes(){d->u=this;r->l=this;}
-        void kill(){d->u = nullptr; r->l = nullptr;erase();}
-        DHorizontalSideNode * d;
-        DVerticalSideNode * r;
+public:
+    RoadTurnDR(){        ax =5 ;
+                         ay = 15;
+                                      bx = 5;
+                                                   by = 15;
+                                                                rot = d90;
+                                                                             AppendFULL(0,0);
+                                                                                          type = RailTypes::RoadTurnDR;
+                    }
+    void LinkNodes(){d->u=this;r->l=this;}
+    void kill(){d->u = nullptr; r->l = nullptr;erase();}
+    DHorizontalSideNode * d;
+    DVerticalSideNode * r;
 };
 
 class RoadTurnDL:public DNetworkListElement
 {
-        public:
-        RoadTurnDL(){        ax =5 ;
-                           ay = 15;
-                           bx = 5;
-                           by = 15;
-                           rot = d180;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTurnDL;
-                  }
-        void LinkNodes(){d->u=this;l->r=this;}
-        void kill(){d->u = nullptr; l->r = nullptr;erase();}
-        DHorizontalSideNode * d;
-        DVerticalSideNode * l;
+public:
+    RoadTurnDL(){        ax =5 ;
+                         ay = 15;
+                                      bx = 5;
+                                                   by = 15;
+                                                                rot = d180;
+                                                                             AppendFULL(0,0);
+                                                                                          type = RailTypes::RoadTurnDL;
+                    }
+    void LinkNodes(){d->u=this;l->r=this;}
+    void kill(){d->u = nullptr; l->r = nullptr;erase();}
+    DHorizontalSideNode * d;
+    DVerticalSideNode * l;
 };
 
 class RoadTurnUL:public DNetworkListElement
 {
-        public:
-        RoadTurnUL(){        ax =5 ;
-                           ay = 15;
-                           bx = 5;
-                           by = 15;
-                           rot = d270;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTurnUL;
-                  }
-        void LinkNodes(){u->d=this;l->r=this;}
-        void kill(){u->d = nullptr; l->r = nullptr;erase();}
-        DHorizontalSideNode * u;
-        DVerticalSideNode * l;
+public:
+    RoadTurnUL(){        ax =5 ;
+                         ay = 15;
+                                      bx = 5;
+                                                   by = 15;
+                                                                rot = d270;
+                                                                             AppendFULL(0,0);
+                                                                                          type = RailTypes::RoadTurnUL;
+                    }
+    void LinkNodes(){u->d=this;l->r=this;}
+    void kill(){u->d = nullptr; l->r = nullptr;erase();}
+    DHorizontalSideNode * u;
+    DVerticalSideNode * l;
 };
 
 // ============= diag turns ===========
@@ -2098,17 +2021,17 @@ class RoadTurnUL:public DNetworkListElement
 
 class RoadTurnULUR:public DNetworkListElement
 {
-        public:
-        RoadTurnULUR(){        ax =6 ;
+public:
+    RoadTurnULUR(){        ax =6 ;
                            ay = 13;
-                           bx = 6;
-                           by = 13;
-                           rot = d0;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTurnULUR;
-                  }
-        void LinkNodes(){ur->dl=this;ul->dr=this;}
-        void kill(){ur->dl = nullptr; ul->dr = nullptr;erase();}
+                                          bx = 6;
+                                                         by = 13;
+                                                                        rot = d0;
+                                                                                       AppendFULL(0,0);
+                                                                                                      type = RailTypes::RoadTurnULUR;
+                      }
+    void LinkNodes(){ur->dl=this;ul->dr=this;}
+    void kill(){ur->dl = nullptr; ul->dr = nullptr;erase();}
     DCornerNode * ul;
     DCornerNode * ur;
 };
@@ -2117,17 +2040,17 @@ class RoadTurnULUR:public DNetworkListElement
 
 class RoadTurnULDL:public DNetworkListElement
 {
-        public:
-        RoadTurnULDL(){        ax =6 ;
+public:
+    RoadTurnULDL(){        ax =6 ;
                            ay = 13;
-                           bx = 6;
-                           by = 13;
-                           rot = d270;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTurnULDL;
-                  }
-        void LinkNodes(){ul->dr=this;dl->ur=this;}
-        void kill(){ul->dr = nullptr; dl->ur = nullptr;erase();}
+                                          bx = 6;
+                                                         by = 13;
+                                                                        rot = d270;
+                                                                                       AppendFULL(0,0);
+                                                                                                      type = RailTypes::RoadTurnULDL;
+                      }
+    void LinkNodes(){ul->dr=this;dl->ur=this;}
+    void kill(){ul->dr = nullptr; dl->ur = nullptr;erase();}
     DCornerNode * ul;
     DCornerNode * dl;
 };
@@ -2135,34 +2058,34 @@ class RoadTurnULDL:public DNetworkListElement
 
 class RoadTurnDLDR:public DNetworkListElement
 {
-        public:
-        RoadTurnDLDR(){        ax =6 ;
+public:
+    RoadTurnDLDR(){        ax =6 ;
                            ay = 13;
-                           bx = 6;
-                           by = 13;
-                           rot = d180;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTurnDLDR;
-                  }
-        void LinkNodes(){dr->ul=this;dl->ur=this;}
-        void kill(){dr->ul = nullptr; dl->ur = nullptr;erase();}
+                                          bx = 6;
+                                                         by = 13;
+                                                                        rot = d180;
+                                                                                       AppendFULL(0,0);
+                                                                                                      type = RailTypes::RoadTurnDLDR;
+                      }
+    void LinkNodes(){dr->ul=this;dl->ur=this;}
+    void kill(){dr->ul = nullptr; dl->ur = nullptr;erase();}
     DCornerNode * dr;
     DCornerNode * dl;
 };
 
 class RoadTurnDRUR:public DNetworkListElement
 {
-        public:
-        RoadTurnDRUR(){        ax =6 ;
+public:
+    RoadTurnDRUR(){        ax =6 ;
                            ay = 13;
-                           bx = 6;
-                           by = 13;
-                           rot = d90;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTurnDRUR;
-                  }
-        void LinkNodes(){ur->dl=this;dr->ul=this;}
-        void kill(){ur->dl = nullptr; dr->ul = nullptr;erase();}
+                                          bx = 6;
+                                                         by = 13;
+                                                                        rot = d90;
+                                                                                       AppendFULL(0,0);
+                                                                                                      type = RailTypes::RoadTurnDRUR;
+                      }
+    void LinkNodes(){ur->dl=this;dr->ul=this;}
+    void kill(){ur->dl = nullptr; dr->ul = nullptr;erase();}
     DCornerNode * dr;
     DCornerNode * ur;
 };
@@ -2171,17 +2094,17 @@ class RoadTurnDRUR:public DNetworkListElement
 
 class RoadTCrossU:public DNetworkListElement
 {
-        public:
-        RoadTCrossU(){        ax =6 ;
-                           ay = 14;
-                           bx = 6;
-                           by = 14;
-                           rot = d270;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTCrossU;
-                  }
-        void LinkNodes(){r->l=this;l->r=this;u->d=this;}
-        void kill(){r->l = nullptr; l->r = nullptr; u->d=nullptr; erase();}
+public:
+    RoadTCrossU(){        ax =6 ;
+                          ay = 14;
+                                        bx = 6;
+                                                      by = 14;
+                                                                    rot = d270;
+                                                                                  AppendFULL(0,0);
+                                                                                                type = RailTypes::RoadTCrossU;
+                     }
+    void LinkNodes(){r->l=this;l->r=this;u->d=this;}
+    void kill(){r->l = nullptr; l->r = nullptr; u->d=nullptr; erase();}
     DVerticalSideNode *l;
     DVerticalSideNode *r;
     DHorizontalSideNode *u;
@@ -2190,17 +2113,17 @@ class RoadTCrossU:public DNetworkListElement
 
 class RoadTCrossR:public DNetworkListElement
 {
-        public:
-        RoadTCrossR(){        ax =6 ;
-                           ay = 14;
-                           bx = 6;
-                           by = 14;
-                           rot = d0;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTCrossR;
-                  }
-        void LinkNodes(){u->d=this;d->u=this;r->l=this;}
-        void kill(){u->d = nullptr; d->u = nullptr;r->l=nullptr;erase();}
+public:
+    RoadTCrossR(){        ax =6 ;
+                          ay = 14;
+                                        bx = 6;
+                                                      by = 14;
+                                                                    rot = d0;
+                                                                                  AppendFULL(0,0);
+                                                                                                type = RailTypes::RoadTCrossR;
+                     }
+    void LinkNodes(){u->d=this;d->u=this;r->l=this;}
+    void kill(){u->d = nullptr; d->u = nullptr;r->l=nullptr;erase();}
 
     DHorizontalSideNode *u;
     DHorizontalSideNode *d;
@@ -2209,56 +2132,56 @@ class RoadTCrossR:public DNetworkListElement
 
 class RoadTCrossD:public DNetworkListElement
 {
-        public:
-        RoadTCrossD(){        ax =6 ;
-                           ay = 14;
-                           bx = 6;
-                           by = 14;
-                           rot = d90;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTCrossD;
-                  }
-        void LinkNodes(){r->l=this;l->r=this;u->d=this;}
-        void kill(){r->l = nullptr; l->r = nullptr; u->d=nullptr;erase();}
-        DVerticalSideNode *l;
-        DVerticalSideNode *r;
-        DHorizontalSideNode *u;
+public:
+    RoadTCrossD(){        ax =6 ;
+                          ay = 14;
+                                        bx = 6;
+                                                      by = 14;
+                                                                    rot = d90;
+                                                                                  AppendFULL(0,0);
+                                                                                                type = RailTypes::RoadTCrossD;
+                     }
+    void LinkNodes(){r->l=this;l->r=this;u->d=this;}
+    void kill(){r->l = nullptr; l->r = nullptr; u->d=nullptr;erase();}
+    DVerticalSideNode *l;
+    DVerticalSideNode *r;
+    DHorizontalSideNode *u;
 };
 
 class RoadTCrossL:public DNetworkListElement
 {
-        public:
-        RoadTCrossL(){        ax =6 ;
-                           ay = 14;
-                           bx = 6;
-                           by = 14;
-                           rot = d180;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTCrossL;
-                  }
-        void LinkNodes(){u->d=this;d->u=this;l->r=this;}
-        void kill(){u->d = nullptr; d->u = nullptr;l->r=nullptr;erase();}
+public:
+    RoadTCrossL(){        ax =6 ;
+                          ay = 14;
+                                        bx = 6;
+                                                      by = 14;
+                                                                    rot = d180;
+                                                                                  AppendFULL(0,0);
+                                                                                                type = RailTypes::RoadTCrossL;
+                     }
+    void LinkNodes(){u->d=this;d->u=this;l->r=this;}
+    void kill(){u->d = nullptr; d->u = nullptr;l->r=nullptr;erase();}
 
-        DHorizontalSideNode *u;
-        DHorizontalSideNode *d;
-        DVerticalSideNode *l;
+    DHorizontalSideNode *u;
+    DHorizontalSideNode *d;
+    DVerticalSideNode *l;
 };
 
 //==== diag t-cross
 
 class RoadTCrossUL:public DNetworkListElement
 {
-        public:
-        RoadTCrossUL(){        ax =7 ;
+public:
+    RoadTCrossUL(){        ax =7 ;
                            ay = 13;
-                           bx = 7;
-                           by = 13;
-                           rot = d270;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTCrossUL;
-                  }
-        void LinkNodes(){ur->dl=this;dl->ur=this;ul->dr=this;}
-        void kill(){ur->dl = nullptr; dl->ur = nullptr;ul->dr=nullptr;erase();}
+                                          bx = 7;
+                                                         by = 13;
+                                                                        rot = d270;
+                                                                                       AppendFULL(0,0);
+                                                                                                      type = RailTypes::RoadTCrossUL;
+                      }
+    void LinkNodes(){ur->dl=this;dl->ur=this;ul->dr=this;}
+    void kill(){ur->dl = nullptr; dl->ur = nullptr;ul->dr=nullptr;erase();}
 
     DCornerNode * ul;
     DCornerNode * dl;
@@ -2267,17 +2190,17 @@ class RoadTCrossUL:public DNetworkListElement
 
 class RoadTCrossUR:public DNetworkListElement
 {
-        public:
-        RoadTCrossUR(){        ax =7;
+public:
+    RoadTCrossUR(){        ax =7;
                            ay = 13;
-                           bx = 7;
-                           by = 13;
-                           rot = d0;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTCrossUR;
-                  }
-        void LinkNodes(){ur->dl=this;ul->dr=this;dr->ul=this;}
-        void kill(){ur->dl = nullptr; ul->dr = nullptr;dr->ul=nullptr;erase();}
+                                          bx = 7;
+                                                         by = 13;
+                                                                        rot = d0;
+                                                                                       AppendFULL(0,0);
+                                                                                                      type = RailTypes::RoadTCrossUR;
+                      }
+    void LinkNodes(){ur->dl=this;ul->dr=this;dr->ul=this;}
+    void kill(){ur->dl = nullptr; ul->dr = nullptr;dr->ul=nullptr;erase();}
     DCornerNode * ur;
     DCornerNode * ul;
     DCornerNode * dr;
@@ -2286,17 +2209,17 @@ class RoadTCrossUR:public DNetworkListElement
 
 class RoadTCrossDL:public DNetworkListElement
 {
-        public:
-        RoadTCrossDL(){        ax =7 ;
+public:
+    RoadTCrossDL(){        ax =7 ;
                            ay = 13;
-                           bx = 7;
-                           by = 13;
-                           rot = d180;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTCrossDL;
-                  }
-        void LinkNodes(){ul->dr=this;dl->ur=this;dr->ul=this;}
-        void kill(){ul->dr = nullptr; dl->ur = nullptr;dr->ul=this;erase();}
+                                          bx = 7;
+                                                         by = 13;
+                                                                        rot = d180;
+                                                                                       AppendFULL(0,0);
+                                                                                                      type = RailTypes::RoadTCrossDL;
+                      }
+    void LinkNodes(){ul->dr=this;dl->ur=this;dr->ul=this;}
+    void kill(){ul->dr = nullptr; dl->ur = nullptr;dr->ul=this;erase();}
     DCornerNode * ul;
     DCornerNode * dr;
     DCornerNode * dl;
@@ -2304,17 +2227,17 @@ class RoadTCrossDL:public DNetworkListElement
 
 class RoadTCrossDR:public DNetworkListElement
 {
-        public:
-        RoadTCrossDR(){        ax =7 ;
+public:
+    RoadTCrossDR(){        ax =7 ;
                            ay = 13;
-                           bx = 7;
-                           by = 13;
-                           rot = d90;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadTCrossDR;
-                  }
-        void LinkNodes(){ur->dl=this;dl->ur=this;dr->ul=this;}
-        void kill(){ur->dl = nullptr; dl->ur = nullptr;dr->ul=this;erase();}
+                                          bx = 7;
+                                                         by = 13;
+                                                                        rot = d90;
+                                                                                       AppendFULL(0,0);
+                                                                                                      type = RailTypes::RoadTCrossDR;
+                      }
+    void LinkNodes(){ur->dl=this;dl->ur=this;dr->ul=this;}
+    void kill(){ur->dl = nullptr; dl->ur = nullptr;dr->ul=this;erase();}
     DCornerNode * dl;
     DCornerNode * ur;
     DCornerNode * dr;
@@ -2324,44 +2247,44 @@ class RoadTCrossDR:public DNetworkListElement
 
 class RoadXCross:public DNetworkListElement
 {
-        public:
-        RoadXCross(){        ax =5 ;
-                           ay = 12;
-                           bx = 5;
-                           by = 12;
-                           rot = d0;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadXCross;
-                  }
-        void LinkNodes(){u->d=this;d->u=this;l->r=this;r->l=this;}
-        void kill(){u->d = nullptr; l->r = nullptr; d->u=nullptr;r->l=nullptr;erase();}
+public:
+    RoadXCross(){        ax =5 ;
+                         ay = 12;
+                                      bx = 5;
+                                                   by = 12;
+                                                                rot = d0;
+                                                                             AppendFULL(0,0);
+                                                                                          type = RailTypes::RoadXCross;
+                    }
+    void LinkNodes(){u->d=this;d->u=this;l->r=this;r->l=this;}
+    void kill(){u->d = nullptr; l->r = nullptr; d->u=nullptr;r->l=nullptr;erase();}
 
-        DHorizontalSideNode *u;
-        DHorizontalSideNode *d;
+    DHorizontalSideNode *u;
+    DHorizontalSideNode *d;
 
-        DVerticalSideNode *l;
-        DVerticalSideNode *r;
+    DVerticalSideNode *l;
+    DVerticalSideNode *r;
 
 };
 
 class RoadXCrossDIAG:public DNetworkListElement
 {
-        public:
-        RoadXCrossDIAG(){        ax =8 ;
-                           ay = 13;
-                           bx = 8;
-                           by = 13;
-                           rot = d0;
-                            AppendFULL(0,0);
-                           type = RailTypes::RoadXCrossDIAG;
-                  }
-        void LinkNodes(){ur->dl=this;dl->ur=this;ul->dr=this;dr->ul=this;}
-        void kill(){ur->dl = nullptr; dl->ur = nullptr;ul->dr=nullptr;dr->ul=nullptr;erase();}
+public:
+    RoadXCrossDIAG(){        ax =8 ;
+                             ay = 13;
+                                              bx = 8;
+                                                               by = 13;
+                                                                                rot = d0;
+                                                                                                 AppendFULL(0,0);
+                                                                                                                  type = RailTypes::RoadXCrossDIAG;
+                        }
+    void LinkNodes(){ur->dl=this;dl->ur=this;ul->dr=this;dr->ul=this;}
+    void kill(){ur->dl = nullptr; dl->ur = nullptr;ul->dr=nullptr;dr->ul=nullptr;erase();}
 
-        DCornerNode * ur;
-        DCornerNode * dl;
-        DCornerNode * ul;
-        DCornerNode * dr;
+    DCornerNode * ur;
+    DCornerNode * dl;
+    DCornerNode * ul;
+    DCornerNode * dr;
 };
 
 // =============== side to corners road turns ==========
@@ -2369,15 +2292,15 @@ class RoadXCrossDIAG:public DNetworkListElement
 
 class RoadTurn_U_UL:public DNetworkListElement
 {
-    public:
+public:
     RoadTurn_U_UL(){        ax = 7 ;
-                       ay = 15;
-                       bx = 7;
-                       by = 15;
-                       rot = d270;
-                        AppendFULL(0,0);
-                       type = RailTypes::RoadTurn_U_UL;
-              }
+                            ay = 15;
+                                            bx = 7;
+                                                            by = 15;
+                                                                            rot = d270;
+                                                                                            AppendFULL(0,0);
+                                                                                                            type = RailTypes::RoadTurn_U_UL;
+                       }
     void LinkNodes(){d->u=this;ul->dr=this;}
     void kill(){d->u = nullptr; ul->dr = nullptr;erase();}
 
@@ -2388,15 +2311,15 @@ class RoadTurn_U_UL:public DNetworkListElement
 
 class RoadTurn_U_UR:public DNetworkListElement
 {
-    public:
+public:
     RoadTurn_U_UR(){        ax = 7 ;
-                       ay = 15;
-                       bx = 7;
-                       by = 15;
-                       rot = m90;
-                        AppendFULL(0,0);
-                       type = RailTypes::RoadTurn_U_UR;
-              }
+                            ay = 15;
+                                            bx = 7;
+                                                            by = 15;
+                                                                            rot = m90;
+                                                                                            AppendFULL(0,0);
+                                                                                                            type = RailTypes::RoadTurn_U_UR;
+                       }
     void LinkNodes(){d->u=this;ur->dl=this;}
     void kill(){d->u = nullptr; ur->dl = nullptr;erase();}
 
@@ -2404,7 +2327,7 @@ class RoadTurn_U_UR:public DNetworkListElement
     DCornerNode * ur;
 };
 
- // to do
+// to do
 
 
 // ====================== END =====================
@@ -2412,14 +2335,14 @@ class RoadTurn_U_UR:public DNetworkListElement
 
 class DNetworkList
 {
-    public:
-        DNetworkList();
+public:
+    DNetworkList();
 
-        DNetworkListElement *first = nullptr;
-        DNetworkListElement *last = nullptr;
+    DNetworkListElement *first = nullptr;
+    DNetworkListElement *last = nullptr;
 
-        ~DNetworkList();
-        void append(DNetworkListElement* newbie);
+    ~DNetworkList();
+    void append(DNetworkListElement* newbie);
 };
 
 
